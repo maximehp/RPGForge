@@ -49,6 +49,7 @@ import { migrateCharacter as migrateCharacterDoc, migratePack as migratePackMani
 import { compileCanonicalToPackArtifacts as compileCanonicalArtifacts, syncOpen5eSrd as syncOpen5eSrdEngine } from "../engine/v2/open5eImporter";
 import { evaluateCreatorRules } from "../runtime/v2/creatorRules";
 import {
+    classLevelsById,
     evaluateSrd2014CreatorIssues,
     normalizeSrd2014CreatorSeed,
     recommendedEquipmentOptions,
@@ -878,6 +879,7 @@ export async function hydrateCreatorStep(
     const fields = Array.isArray((step as any).fields) ? (step as any).fields as CreatorFieldV3[] : [];
     const derivedContext: Record<string, unknown> = {
         selectedClassIds: selectedClassIds(session.seed),
+        classLevels: classLevelsById(session.seed),
         spellLevelCap: spellLevelCap(session.seed),
         selectedRaceSubraces: selectedSubraceOptions(ruleset, session.seed),
         recommendedEquipmentOptions: recommendedEquipmentOptions(session.seed)

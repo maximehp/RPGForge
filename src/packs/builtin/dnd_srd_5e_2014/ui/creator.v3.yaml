@@ -5,7 +5,7 @@ creator:
   rules:
     - id: level-range
       severity: error
-      when: "level_total < 1 or level_total > 20"
+      when: "size(class_plan) > 0 and (level_total < 1 or level_total > 20)"
       message: "Total character level must be between 1 and 20."
   steps:
     - id: identity
@@ -54,12 +54,6 @@ creator:
       preloadContentTypes: [classes]
       searchContentTypes: [classes]
       fields:
-        - id: level_total
-          label: Starting Level
-          type: number
-          bindTo: level_total
-          required: true
-          default: 1
         - id: class_plan
           label: Class Distribution
           type: repeatGroup
@@ -104,7 +98,7 @@ creator:
           label: Warlock Pact Boon
           type: select
           bindTo: warlock_pact_boon
-          visibleWhen: { expression: "includes(selectedClassIds, 'srd_warlock')" }
+          visibleWhen: { expression: "classLevels.srd_warlock >= 3" }
           options:
             kind: static
             values:
@@ -115,7 +109,7 @@ creator:
           label: Fighter Fighting Style
           type: select
           bindTo: fighter_fighting_style
-          visibleWhen: { expression: "includes(selectedClassIds, 'srd_fighter')" }
+          visibleWhen: { expression: "classLevels.srd_fighter >= 1" }
           options:
             kind: static
             values:
@@ -129,7 +123,7 @@ creator:
           label: Cleric Domain Focus
           type: select
           bindTo: cleric_divine_domain_focus
-          visibleWhen: { expression: "includes(selectedClassIds, 'srd_cleric')" }
+          visibleWhen: { expression: "classLevels.srd_cleric >= 1" }
           options:
             kind: static
             values:
@@ -144,7 +138,7 @@ creator:
           label: Rogue Expertise Choices
           type: text
           bindTo: rogue_expertise_choices
-          visibleWhen: { expression: "includes(selectedClassIds, 'srd_rogue')" }
+          visibleWhen: { expression: "classLevels.srd_rogue >= 1" }
         - id: class_feature_choices
           label: Additional Class-Specific Choices
           type: repeatGroup

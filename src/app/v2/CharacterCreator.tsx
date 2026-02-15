@@ -10,7 +10,12 @@ import {
     upsertCreatorSessionUiState,
     validateCreatorSession
 } from "../../services/v2RuntimeApi";
-import { pointBuySpent } from "../../runtime/v2/creatorSrd2014";
+import {
+    classLevelsById,
+    pointBuySpent,
+    requiredSubclassClassIds,
+    synchronizeClassSelections
+} from "../../runtime/v2/creatorSrd2014";
 
 type Props = {
     preset: CharacterCreatorPresetV3;
@@ -100,27 +105,59 @@ function parseFieldValue(field: CreatorFieldV3, raw: string, checked: boolean): 
 }
 
 function selectedClassIdsFromSeed(seed: Record<string, unknown>): string[] {
-    const rows = Array.isArray(seed.class_plan) ? seed.class_plan : [];
-    const ids = new Set<string>();
-    for (const raw of rows) {
-        if (!raw || typeof raw !== "object") continue;
-        const row = raw as Record<string, unknown>;
-        const id = String(row.class_id || row.classId || "").trim();
-        if (id) ids.add(id);
+    return Object.keys(classLevelsById(seed));
+}
+
+function classSyncToken(seed: Record<string, unknown>): string {
+    return JSON.stringify({
+        class_plan: seed.class_plan,
+        subclass_plan: seed.subclass_plan,
+        level_total: seed.level_total,
+        level: seed.level
+    });
+}
+
+function prettyId(value: unknown): string {
+    return String(value || "")
+        .replace(/^srd_/, "")
+        .replace(/[-_]/g, " ")
+        .replace(/\b\w/g, letter => letter.toUpperCase());
+}
+
+function numericFieldBounds(
+    field: CreatorFieldV3,
+    optionKey: string,
+    seed: Record<string, unknown>
+): { min?: number; max?: number; step?: number } {
+    if (field.type !== "number") return {};
+
+    if (optionKey.endsWith(".levels") || optionKey === "level_total" || optionKey === "level") {
+        return { min: 1, max: 20, step: 1 };
     }
-    return [...ids];
+
+    const bindTo = field.bindTo || field.id;
+    if (bindTo.startsWith("stats.")) {
+        if (String(seed.ability_method || "") === "point_buy") {
+            return { min: 8, max: 15, step: 1 };
+        }
+        return { min: 3, max: 20, step: 1 };
+    }
+
+    return { step: 1 };
 }
 
 function evaluateVisible(field: CreatorFieldV3, seed: Record<string, unknown>, row?: Record<string, unknown>): boolean {
     if (!field.visibleWhen?.expression?.trim()) return true;
     try {
         const selectedClassIds = selectedClassIdsFromSeed(seed);
+        const classLevels = classLevelsById(seed);
         const compiled = parser.parse(field.visibleWhen.expression);
         return Boolean(compiled.evaluate({
             seed,
             row,
             ...seed,
             selectedClassIds,
+            classLevels,
             size: (value: unknown) => {
                 if (Array.isArray(value) || typeof value === "string") return value.length;
                 if (value && typeof value === "object") return Object.keys(value).length;
@@ -260,6 +297,7 @@ export function CharacterCreator(props: Props) {
     });
     const [loadingStep, setLoadingStep] = React.useState(false);
     const [localRefreshToken, setLocalRefreshToken] = React.useState(0);
+    const [seedHydrateToken, setSeedHydrateToken] = React.useState(0);
     const [focusErrorKey, setFocusErrorKey] = React.useState("");
 
     const [customModal, setCustomModal] = React.useState<CustomModalState>({
@@ -287,6 +325,22 @@ export function CharacterCreator(props: Props) {
         props.onSeedChange?.(seed);
     }, [props.onSeedChange, seed]);
 
+    const classSyncState = React.useMemo(() => classSyncToken(seed), [seed]);
+    React.useEffect(() => {
+        setSeed(prev => {
+            const synced = synchronizeClassSelections(prev);
+            return classSyncToken(prev) === classSyncToken(synced) ? prev : synced;
+        });
+    }, [classSyncState]);
+
+    const seedFingerprint = React.useMemo(() => JSON.stringify(seed), [seed]);
+    React.useEffect(() => {
+        const timeout = window.setTimeout(() => {
+            setSeedHydrateToken(value => value + 1);
+        }, 140);
+        return () => window.clearTimeout(timeout);
+    }, [seedFingerprint]);
+
     const totalSteps = preset.steps.length;
     const step = preset.steps[Math.min(stepIndex, Math.max(0, totalSteps - 1))];
     const stepId = step?.id || "";
@@ -304,6 +358,7 @@ export function CharacterCreator(props: Props) {
         const run = async () => {
             try {
                 setLoadingStep(true);
+                await updateCreatorSessionSelection(props.sessionId, seed);
                 const hydrated = await hydrateCreatorStep(props.sessionId, step.id, { limit: 300, offset: 0 });
                 if (cancelled) return;
                 setStepOptions(hydrated.options);
@@ -321,7 +376,7 @@ export function CharacterCreator(props: Props) {
         return () => {
             cancelled = true;
         };
-    }, [localRefreshToken, props.refreshToken, props.sessionId, step]);
+    }, [localRefreshToken, props.refreshToken, props.sessionId, seedHydrateToken, step]);
 
     React.useEffect(() => {
         if (!step) return;
@@ -444,10 +499,12 @@ export function CharacterCreator(props: Props) {
         value: unknown,
         onChange: (next: unknown) => void,
         optionKey: string,
+        currentSeed: Record<string, unknown>,
         error?: string,
-        customApply?: (id: string) => void
+        customApply?: (id: string) => void,
+        optionsOverride?: Array<{ value: string; label: string; meta?: Record<string, unknown> }>
     ) => {
-        const options = stepOptions[optionKey] || [];
+        const options = optionsOverride || stepOptions[optionKey] || [];
         const showCustom = isCustomizableField(field) && customApply;
 
         if (field.type === "toggle") {
@@ -541,6 +598,7 @@ export function CharacterCreator(props: Props) {
                 <input
                     type={field.type === "number" ? "number" : "text"}
                     value={value === undefined ? "" : String(value)}
+                    {...numericFieldBounds(field, optionKey, currentSeed)}
                     onChange={e => onChange(parseFieldValue(field, e.target.value, e.target.checked))}
                 />
                 {field.helpText ? <small className="home-muted">{field.helpText}</small> : null}
@@ -557,9 +615,15 @@ export function CharacterCreator(props: Props) {
         const remaining = 27 - spent;
         return `${spent}/27 points spent${remaining >= 0 ? ` (${remaining} remaining)` : " (over budget)"}`;
     }, [seed, step]);
+    const classLevels = React.useMemo(() => classLevelsById(seed), [seed]);
+    const classLevelTotal = React.useMemo(
+        () => Object.values(classLevels).reduce((sum, value) => sum + Number(value || 0), 0),
+        [classLevels]
+    );
+    const requiredSubclassIds = React.useMemo(() => requiredSubclassClassIds(seed), [seed]);
 
     return (
-        <div className="creator-shell glass-surface">
+        <div className="creator-shell">
             <header className="creator-header">
                 <h2>{preset.title || "Character Creator"}</h2>
                 {preset.description ? <p>{preset.description}</p> : null}
@@ -585,6 +649,21 @@ export function CharacterCreator(props: Props) {
                     <h3>{step.title}</h3>
                     {step.description ? <p>{step.description}</p> : null}
                     {pointBuyInfo ? <p className="creator-point-buy">{pointBuyInfo}</p> : null}
+                    {step.id === "class_plan" ? (
+                        <div className="creator-class-summary">
+                            <p>
+                                Starting Level (derived from class distribution): <strong>{classLevelTotal}</strong>
+                            </p>
+                            {requiredSubclassIds.length ? (
+                                <p>
+                                    Subclass required for:{" "}
+                                    <strong>{requiredSubclassIds.map(id => prettyId(id)).join(", ")}</strong>
+                                </p>
+                            ) : (
+                                <p>Subclass fields unlock automatically when class levels reach their subclass thresholds.</p>
+                            )}
+                        </div>
+                    ) : null}
                     {loadingStep ? <p className="home-muted">Loading step options...</p> : null}
 
                     {stepIssues.length ? (
@@ -612,6 +691,7 @@ export function CharacterCreator(props: Props) {
                                     value,
                                     next => setField(field, next),
                                     field.id,
+                                    seed,
                                     error,
                                     id => {
                                         if (field.type === "multiSelect") {
@@ -626,38 +706,52 @@ export function CharacterCreator(props: Props) {
 
                             const rows = Array.isArray(value) ? value as Array<Record<string, unknown>> : [];
                             const nestedFields = Array.isArray(field.fields) ? field.fields : [];
+                            const isManagedSubclassPlan = step.id === "class_plan" && key === "subclass_plan";
 
                             return (
                                 <div key={field.id} className="creator-repeat-group" data-error-key={key}>
                                     <div className="creator-repeat-head">
                                         <strong>{field.label}</strong>
-                                        <button
-                                            type="button"
-                                            className="glass-btn secondary"
-                                            onClick={() => {
-                                                const nextRows = [...rows, buildDefaultRepeatRow(nestedFields)];
-                                                setField(field, nextRows);
-                                            }}
-                                        >
-                                            Add
-                                        </button>
+                                        {!isManagedSubclassPlan ? (
+                                            <button
+                                                type="button"
+                                                className="glass-btn secondary"
+                                                onClick={() => {
+                                                    const nextRows = [...rows, buildDefaultRepeatRow(nestedFields)];
+                                                    setField(field, nextRows);
+                                                }}
+                                            >
+                                                Add
+                                            </button>
+                                        ) : null}
                                     </div>
                                     {error ? <small className="creator-error">{error}</small> : null}
+                                    {isManagedSubclassPlan && rows.length === 0 ? (
+                                        <small className="home-muted">
+                                            Subclass selections will appear once a class reaches its subclass unlock level.
+                                        </small>
+                                    ) : null}
                                     <div className="creator-repeat-rows">
                                         {rows.map((row, rowIndex) => (
                                             <div key={`${field.id}-${rowIndex}`} className="creator-repeat-row">
                                                 <div className="creator-repeat-row-header">
-                                                    <strong>Entry {rowIndex + 1}</strong>
-                                                    <button
-                                                        type="button"
-                                                        className="glass-btn secondary"
-                                                        onClick={() => {
-                                                            const nextRows = rows.filter((_, i) => i !== rowIndex);
-                                                            setField(field, nextRows);
-                                                        }}
-                                                    >
-                                                        Remove
-                                                    </button>
+                                                    <strong>
+                                                        {isManagedSubclassPlan
+                                                            ? prettyId((row as Record<string, unknown>).class_id || `Entry ${rowIndex + 1}`)
+                                                            : `Entry ${rowIndex + 1}`}
+                                                    </strong>
+                                                    {!isManagedSubclassPlan ? (
+                                                        <button
+                                                            type="button"
+                                                            className="glass-btn secondary"
+                                                            onClick={() => {
+                                                                const nextRows = rows.filter((_, i) => i !== rowIndex);
+                                                                setField(field, nextRows);
+                                                            }}
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    ) : null}
                                                 </div>
                                                 <div className="creator-fields">
                                                     {nestedFields.map(nested => {
@@ -667,6 +761,31 @@ export function CharacterCreator(props: Props) {
                                                         const nestedErrorKey = `${key}[${rowIndex}].${nestedKey}`;
                                                         const nestedError = showErrors ? errors[nestedErrorKey] : "";
                                                         const optionKey = `${field.id}.${nested.id}`;
+                                                        const rowClassId = String((row as Record<string, unknown>).class_id || "");
+                                                        const subclassOptions = isManagedSubclassPlan && nested.id === "subclass_id"
+                                                            ? (stepOptions[optionKey] || []).filter(option => {
+                                                                const owner = String(
+                                                                    ((option.meta as Record<string, unknown> | undefined)?.data as Record<string, unknown> | undefined)?.subclass_of
+                                                                        ? (((option.meta as Record<string, unknown>).data as Record<string, unknown>).subclass_of as Record<string, unknown>).key
+                                                                        : ""
+                                                                );
+                                                                return owner === rowClassId;
+                                                            })
+                                                            : undefined;
+
+                                                        if (isManagedSubclassPlan && nested.id === "class_id") {
+                                                            return (
+                                                                <label
+                                                                    key={`${field.id}-${rowIndex}-${nested.id}`}
+                                                                    className="creator-field"
+                                                                    data-error-key={nestedErrorKey}
+                                                                >
+                                                                    <span>{nested.label}</span>
+                                                                    <input readOnly value={prettyId(rowClassId)} />
+                                                                    {nestedError ? <small className="creator-error">{nestedError}</small> : null}
+                                                                </label>
+                                                            );
+                                                        }
 
                                                         return (
                                                             <React.Fragment key={`${field.id}-${rowIndex}-${nested.id}`}>
@@ -681,6 +800,7 @@ export function CharacterCreator(props: Props) {
                                                                         setField(field, nextRows);
                                                                     },
                                                                     optionKey,
+                                                                    seed,
                                                                     nestedError,
                                                                     id => {
                                                                         const nextRows = [...rows];
@@ -693,7 +813,8 @@ export function CharacterCreator(props: Props) {
                                                                         }
                                                                         nextRows[rowIndex] = nextRow;
                                                                         setField(field, nextRows);
-                                                                    }
+                                                                    },
+                                                                    subclassOptions
                                                                 )}
                                                             </React.Fragment>
                                                         );

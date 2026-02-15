@@ -610,12 +610,19 @@ button, input, select {
 }
 
 .creator-shell {
-    padding: 18px;
+    min-height: 0;
+    height: 100%;
+    overflow: auto;
+    padding: 16px 18px 12px;
     display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
     gap: 14px;
     width: 100%;
-    max-width: none;
-    margin: 0 auto;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-lg);
+    background:
+        radial-gradient(900px 520px at 18% 0%, rgba(73, 215, 217, 0.12), transparent 55%),
+        linear-gradient(165deg, rgba(22, 39, 60, 0.78), rgba(16, 31, 49, 0.86));
 }
 
 .creator-header h2 {
@@ -630,19 +637,19 @@ button, input, select {
 
 .creator-stepper {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 8px;
 }
 
 .creator-step-pill {
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
     color: var(--text);
     display: grid;
     gap: 2px;
     text-align: left;
-    padding: 8px 10px;
+    padding: 10px;
 }
 
 .creator-step-pill span {
@@ -657,12 +664,18 @@ button, input, select {
 
 .creator-step-pill.is-active {
     border-color: var(--accent-a);
-    background: rgba(73, 215, 217, 0.15);
+    background: rgba(73, 215, 217, 0.16);
 }
 
 .creator-step {
     display: grid;
-    gap: 10px;
+    gap: 12px;
+    align-content: start;
+    min-height: 0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    background: rgba(8, 20, 36, 0.3);
 }
 
 .creator-step h3 {
@@ -672,17 +685,17 @@ button, input, select {
 
 .creator-fields {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
 }
 
 .creator-field {
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.13);
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.03);
-    padding: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 9px;
     display: grid;
-    gap: 6px;
+    gap: 5px;
 }
 
 .creator-field input,
@@ -696,7 +709,7 @@ button, input, select {
 }
 
 .creator-field select[multiple] {
-    min-height: 128px;
+    min-height: 116px;
 }
 
 .creator-inline-custom {
@@ -709,7 +722,7 @@ button, input, select {
     align-items: center;
     gap: 8px;
     color: var(--muted);
-    padding: 10px;
+    padding: 9px;
 }
 
 .creator-actions {
@@ -721,10 +734,11 @@ button, input, select {
 .creator-actions-sticky {
     position: sticky;
     bottom: 0;
-    padding: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    z-index: 6;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: var(--radius-sm);
-    background: rgba(15, 24, 36, 0.92);
+    background: rgba(8, 18, 30, 0.96);
     backdrop-filter: blur(8px);
 }
 
@@ -765,14 +779,30 @@ button, input, select {
     gap: 4px;
 }
 
+.creator-class-summary {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid rgba(73, 215, 217, 0.28);
+    border-radius: var(--radius-sm);
+    background: rgba(73, 215, 217, 0.08);
+}
+
+.creator-class-summary p {
+    margin: 0;
+    color: #cbe8ff;
+    font-size: 0.9rem;
+}
+
 .creator-repeat-group {
     grid-column: 1 / -1;
     display: grid;
     gap: 8px;
     padding: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
 }
 
 .creator-repeat-head,
@@ -791,10 +821,10 @@ button, input, select {
 .creator-repeat-row {
     display: grid;
     gap: 8px;
-    padding: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.13);
+    padding: 9px;
+    border: 1px solid rgba(255, 255, 255, 0.11);
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.015);
 }
 
 .creator-warning-modal {
@@ -817,6 +847,21 @@ button, input, select {
 .creator-custom-dialog {
     max-height: 90vh;
     overflow: auto;
+}
+
+@media (max-width: 920px) {
+    .creator-shell {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .creator-stepper {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .creator-fields {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 1024px) {

@@ -67,7 +67,18 @@ const ruleset: ResolvedRuleset = {
             }
         },
         feats: {},
-        races: {},
+        races: {
+            dwarf: {
+                id: "dwarf",
+                contentId: { namespace: "srd_2014", type: "race", slug: "dwarf" },
+                title: "Dwarf",
+                data: {
+                    subraces: [
+                        { slug: "hill-dwarf", name: "Hill Dwarf" }
+                    ]
+                }
+            }
+        },
         items: {}
     },
     creator: {
@@ -120,12 +131,27 @@ describe("creatorSrd2014", () => {
         const normalized = normalizeSrd2014CreatorSeed({
             selected_feats: ["feat_a"],
             asi_choices: [{ choice_type: "feat", feat_id: "feat_b" }],
+            class_plan: [{ class_id: "srd_wizard", levels: 4 }],
             equipment_package_ids: ["pkg_wizard_default"],
             starting_items: ["item_a"]
         });
 
+        expect(normalized.level_total).toBe(4);
+        expect(Array.isArray(normalized.subclass_plan)).toBe(true);
         expect(normalized.selected_feats).toEqual(["feat_a", "feat_b"]);
         expect(Array.isArray(normalized.starting_items)).toBe(true);
         expect((normalized.starting_items as string[]).length).toBeGreaterThan(1);
+    });
+
+    it("validates numeric class levels and required subrace choices", () => {
+        const classIssues = evaluateSrd2014CreatorIssues(ruleset, {
+            class_plan: [{ class_id: "srd_wizard", levels: 99 }]
+        }, "class_plan");
+        expect(classIssues.some(issue => issue.id.includes("class-plan-level-range"))).toBe(true);
+
+        const ancestryIssues = evaluateSrd2014CreatorIssues(ruleset, {
+            race_id: "dwarf"
+        }, "ancestry");
+        expect(ancestryIssues.some(issue => issue.id === "missing-subrace")).toBe(true);
     });
 });

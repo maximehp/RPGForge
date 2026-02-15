@@ -134,7 +134,8 @@ export function parseClassPlan(seed: Record<string, unknown>): ClassPlanRow[] {
         const entry = asRecord(row);
         const classId = asString(entry.class_id || entry.classId);
         if (!classId) continue;
-        const levels = Math.max(1, Math.floor(asNumber(entry.levels, 1)));
+        const rawLevels = asNumber(entry.levels, Number.NaN);
+        const levels = Number.isFinite(rawLevels) ? Math.floor(rawLevels) : 0;
         out.push({ classId, levels });
     }
     return out;
@@ -143,6 +144,7 @@ export function parseClassPlan(seed: Record<string, unknown>): ClassPlanRow[] {
 export function classLevelsById(seed: Record<string, unknown>): Record<string, number> {
     const out: Record<string, number> = {};
     for (const row of parseClassPlan(seed)) {
+        if (row.levels <= 0) continue;
         out[row.classId] = (out[row.classId] || 0) + row.levels;
     }
     return out;
@@ -153,11 +155,50 @@ export function selectedClassIds(seed: Record<string, unknown>): string[] {
 }
 
 export function totalPlannedLevel(seed: Record<string, unknown>): number {
-    return parseClassPlan(seed).reduce((sum, row) => sum + row.levels, 0);
+    return parseClassPlan(seed).reduce((sum, row) => sum + Math.max(0, row.levels), 0);
 }
 
-export function targetLevel(seed: Record<string, unknown>): number {
-    return Math.max(1, Math.floor(asNumber(seed.level_total ?? seed.level, 1)));
+export function subclassRequirementLevel(classId: string): number {
+    return SUBCLASS_LEVEL_BY_CLASS[classId] || 0;
+}
+
+export function requiredSubclassClassIds(seed: Record<string, unknown>): string[] {
+    const levels = classLevelsById(seed);
+    const rows: string[] = [];
+    for (const [classId, minLevel] of Object.entries(SUBCLASS_LEVEL_BY_CLASS)) {
+        if ((levels[classId] || 0) >= minLevel) {
+            rows.push(classId);
+        }
+    }
+    return rows;
+}
+
+export function synchronizeClassSelections(seed: Record<string, unknown>): Record<string, unknown> {
+    const next = structuredClone(seed) as Record<string, unknown>;
+    const plan = parseClassPlan(next);
+    const total = plan.reduce((sum, row) => sum + Math.max(0, row.levels), 0);
+    next.level_total = total;
+    next.level = total;
+
+    const requiredClassIds = requiredSubclassClassIds(next);
+    const existingRows = Array.isArray(next.subclass_plan) ? next.subclass_plan : [];
+    const existingByClass = new Map<string, Record<string, unknown>>();
+    for (const raw of existingRows) {
+        const row = asRecord(raw);
+        const classId = asString(row.class_id);
+        if (!classId) continue;
+        existingByClass.set(classId, row);
+    }
+    next.subclass_plan = requiredClassIds.map(classId => {
+        const prev = existingByClass.get(classId) || {};
+        return {
+            ...prev,
+            class_id: classId,
+            at_level: subclassRequirementLevel(classId)
+        };
+    });
+
+    return next;
 }
 
 function fullCasterSpellCap(level: number): number {
@@ -323,7 +364,7 @@ function subclassesByClass(seed: Record<string, unknown>): Record<string, string
     return out;
 }
 
-function validateSubclassRequirements(seed: Record<string, unknown>): SpellValidationIssue[] {
+function validateSubclassRequirements(ruleset: ResolvedRuleset, seed: Record<string, unknown>): SpellValidationIssue[] {
     const issues: SpellValidationIssue[] = [];
     const levels = classLevelsById(seed);
     const subclasses = subclassesByClass(seed);
@@ -339,6 +380,27 @@ function validateSubclassRequirements(seed: Record<string, unknown>): SpellValid
             });
         }
     }
+
+    const rows = Array.isArray(seed.subclass_plan) ? seed.subclass_plan : [];
+    for (let index = 0; index < rows.length; index += 1) {
+        const row = asRecord(rows[index]);
+        const classId = asString(row.class_id);
+        const subclassId = asString(row.subclass_id || row.subclass_name);
+        if (!classId || !subclassId) continue;
+
+        const entry = ruleset.content.classes?.[subclassId];
+        const data = asRecord(entry?.data);
+        const parent = asRecord(data.subclass_of);
+        const parentClassId = asString(parent.key);
+        if (parentClassId && parentClassId !== classId) {
+            issues.push({
+                id: `subclass-class-mismatch:${index}`,
+                severity: "error",
+                message: `${subclassId.replace("srd_", "")} does not belong to ${classId.replace("srd_", "")}.`
+            });
+        }
+    }
+
     return issues;
 }
 
@@ -367,6 +429,69 @@ function validatePointBuy(seed: Record<string, unknown>): SpellValidationIssue[]
         });
     }
     return issues;
+}
+
+function validateAbilityScoreInputs(seed: Record<string, unknown>): SpellValidationIssue[] {
+    const issues: SpellValidationIssue[] = [];
+    const stats = asRecord(seed.stats);
+    const method = asString(seed.ability_method);
+
+    for (const ability of ABILITIES) {
+        const raw = stats[ability];
+        const parsed = Number(raw);
+        if (!Number.isFinite(parsed)) {
+            issues.push({
+                id: `ability-invalid:${ability}`,
+                severity: "error",
+                message: `${ability.toUpperCase()} must be a number.`
+            });
+            continue;
+        }
+
+        const value = Math.floor(parsed);
+        const min = method === "point_buy" ? 8 : 3;
+        const max = method === "point_buy" ? 15 : 20;
+        if (value < min || value > max) {
+            issues.push({
+                id: `ability-range:${ability}`,
+                severity: "error",
+                message: `${ability.toUpperCase()} must be between ${min} and ${max}.`
+            });
+        }
+    }
+    return issues;
+}
+
+function validateSubraceSelection(ruleset: ResolvedRuleset, seed: Record<string, unknown>): SpellValidationIssue[] {
+    const raceId = asString(seed.race_id);
+    if (!raceId) return [];
+    const race = ruleset.content.races?.[raceId];
+    const data = asRecord(race?.data);
+    const subraces = Array.isArray(data.subraces) ? data.subraces : [];
+    if (!subraces.length) return [];
+
+    const selected = asString(seed.subrace_id);
+    if (!selected) {
+        return [{
+            id: "missing-subrace",
+            severity: "error",
+            message: "Select a subrace for the chosen race."
+        }];
+    }
+
+    const valid = subraces
+        .map(raw => asRecord(raw))
+        .map(row => asString(row.slug || row.name))
+        .filter(Boolean);
+    if (!valid.includes(selected)) {
+        return [{
+            id: "invalid-subrace",
+            severity: "error",
+            message: "Selected subrace is not valid for the chosen race."
+        }];
+    }
+
+    return [];
 }
 
 function spellClassKeys(entry: ContentEntryV2 | undefined): string[] {
@@ -451,8 +576,9 @@ function validateSpellSelections(ruleset: ResolvedRuleset, seed: Record<string, 
 
 function validateClassPlan(seed: Record<string, unknown>): SpellValidationIssue[] {
     const issues: SpellValidationIssue[] = [];
+    const raw = Array.isArray(seed.class_plan) ? seed.class_plan : [];
     const plan = parseClassPlan(seed);
-    if (!plan.length) {
+    if (!raw.length || !plan.length) {
         issues.push({
             id: "class-plan-empty",
             severity: "error",
@@ -461,13 +587,51 @@ function validateClassPlan(seed: Record<string, unknown>): SpellValidationIssue[
         return issues;
     }
 
+    const seen = new Set<string>();
+    for (let index = 0; index < raw.length; index += 1) {
+        const row = asRecord(raw[index]);
+        const classId = asString(row.class_id || row.classId);
+        const levelsRaw = Number(row.levels);
+        if (!classId) {
+            issues.push({
+                id: `class-plan-class:${index}`,
+                severity: "error",
+                message: `Class plan entry ${index + 1} is missing a class.`
+            });
+            continue;
+        }
+        if (!Number.isFinite(levelsRaw) || Math.floor(levelsRaw) !== levelsRaw) {
+            issues.push({
+                id: `class-plan-level-int:${index}`,
+                severity: "error",
+                message: `Class levels for ${classId.replace("srd_", "")} must be a whole number.`
+            });
+            continue;
+        }
+        const levels = Math.floor(levelsRaw);
+        if (levels < 1 || levels > 20) {
+            issues.push({
+                id: `class-plan-level-range:${index}`,
+                severity: "error",
+                message: `Class levels for ${classId.replace("srd_", "")} must be between 1 and 20.`
+            });
+        }
+        if (seen.has(classId)) {
+            issues.push({
+                id: `class-plan-duplicate:${classId}`,
+                severity: "error",
+                message: `Class ${classId.replace("srd_", "")} appears multiple times.`
+            });
+        }
+        seen.add(classId);
+    }
+
     const sum = totalPlannedLevel(seed);
-    const target = targetLevel(seed);
-    if (sum !== target) {
+    if (sum < 1 || sum > 20) {
         issues.push({
-            id: "class-level-sum",
+            id: "class-level-total-range",
             severity: "error",
-            message: `Class levels (${sum}) must equal target level (${target}).`
+            message: `Total class levels must be between 1 and 20 (currently ${sum}).`
         });
     }
     return issues;
@@ -501,8 +665,10 @@ export function evaluateSrd2014CreatorIssues(
     };
 
     pushIf("class_plan", validateClassPlan(seed));
-    pushIf("class_plan", validateSubclassRequirements(seed));
+    pushIf("class_plan", validateSubclassRequirements(ruleset, seed));
+    pushIf("ancestry", validateSubraceSelection(ruleset, seed));
     pushIf("ability_scores", validatePointBuy(seed));
+    pushIf("ability_scores", validateAbilityScoreInputs(seed));
     pushIf("feats_asi", validateAsiChoices(ruleset, seed));
     pushIf("spells", validateSpellSelections(ruleset, seed));
     return issues;
@@ -535,7 +701,7 @@ function assignedScores(seed: Record<string, unknown>, key: "standard_array_assi
 }
 
 export function normalizeSrd2014CreatorSeed(seed: Record<string, unknown>): Record<string, unknown> {
-    const next = structuredClone(seed) as Record<string, unknown>;
+    const next = synchronizeClassSelections(seed);
     const stats = asRecord(next.stats);
     const method = asString(next.ability_method);
 
