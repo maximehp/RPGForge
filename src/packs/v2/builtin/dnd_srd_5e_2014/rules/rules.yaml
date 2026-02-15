@@ -1,0 +1,19 @@
+rules:
+  formulas:
+    derived.str_mod: "floor((stats.str - 10) / 2)"
+    derived.dex_mod: "floor((stats.dex - 10) / 2)"
+    derived.con_mod: "floor((stats.con - 10) / 2)"
+    derived.proficiency_bonus: "lookup('prof_by_level', level)"
+    derived.armor_class: "10 + derived.dex_mod"
+    derived.initiative: "derived.dex_mod"
+    derived.carry_capacity: "stats.str * 15"
+  lookups:
+    prof_by_level:
+      "1": 2
+      "5": 3
+      "9": 4
+      "13": 5
+      "17": 6
+  hooks:
+    clamp: "builtin:clamp"
+    max: "builtin:max"

@@ -1,0 +1,16 @@
+content:
+  items:
+    - id: shield
+      contentId: { namespace: srd5e, type: item, slug: shield }
+      title: Shield
+      data:
+        weight: 6
+        tags: [armor, shield]
+        bonus:
+          ac: 2
+    - id: chain_mail
+      contentId: { namespace: srd5e, type: item, slug: chain_mail }
+      title: Chain Mail
+      data:
+        weight: 55
+        tags: [armor, heavy]

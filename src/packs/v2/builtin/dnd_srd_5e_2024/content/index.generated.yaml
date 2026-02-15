@@ -1,0 +1,36 @@
+contentIndex:
+  version: 1
+  records:
+    - contentType: items
+      file: content/items.yaml
+      fields: [id, title, data.name, data.key, data.tags]
+    - contentType: items
+      file: content/open5e_items.yaml
+      fields: [id, title, data.name, data.key, data.type]
+    - contentType: spells
+      file: content/spells.yaml
+      fields: [id, title, data.name, data.key]
+    - contentType: spells
+      file: content/open5e_spells.yaml
+      fields: [id, title, data.name, data.key, data.level, data.school.name]
+    - contentType: classes
+      file: content/open5e_classes.yaml
+      fields: [id, title, data.name, data.key]
+    - contentType: races
+      file: content/open5e_races.yaml
+      fields: [id, title, data.name, data.key]
+    - contentType: feats
+      file: content/open5e_feats.yaml
+      fields: [id, title, data.name, data.key]
+    - contentType: backgrounds
+      file: content/open5e_backgrounds.yaml
+      fields: [id, title, data.name, data.key]
+    - contentType: features
+      file: content/features.yaml
+      fields: [id, title, data.name, data.key]
+    - contentType: features
+      file: content/open5e_conditions.yaml
+      fields: [id, title, data.name, data.key]
+    - contentType: monsters
+      file: content/open5e_monsters.yaml
+      fields: [id, title, data.name, data.key, data.type]

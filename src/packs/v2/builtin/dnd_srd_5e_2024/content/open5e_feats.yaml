@@ -1,0 +1,569 @@
+content:
+  feats:
+    - id: srd-2024_ability-score-improvement
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_ability-score-improvement
+      title: Ability Score Improvement
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_ability-score-improvement/
+        key: srd-2024_ability-score-improvement
+        has_prerequisite: true
+        benefits:
+          - desc: Increase one ability score of your choice by 2, or increase two ability
+              scores of your choice by 1. This feat can't increase an ability
+              score above 20.
+          - desc: You can take this feat more than once.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Ability Score Improvement
+        desc: ""
+        prerequisite: Level 4+
+        type: General
+    - id: srd-2024_alert
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_alert
+      title: Alert
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_alert/
+        key: srd-2024_alert
+        has_prerequisite: false
+        benefits:
+          - desc: When you roll Initiative, you can add your Proficiency Bonus to the roll.
+          - desc: Immediately after you roll Initiative, you can swap your Initiative with
+              the Initiative of one willing ally in the same combat. You can't
+              make this swap if you or the ally has the Incapacitated condition.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Alert
+        desc: You gain the following benefits.
+        prerequisite: ""
+        type: Origin
+    - id: srd-2024_archery
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_archery
+      title: Archery
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_archery/
+        key: srd-2024_archery
+        has_prerequisite: true
+        benefits:
+          - desc: You gain a +2 bonus to attack rolls you make with Ranged weapons.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Archery
+        desc: ""
+        prerequisite: Fighting Style Feature
+        type: Fighting Style
+    - id: srd-2024_boon-of-combat-prowess
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_boon-of-combat-prowess
+      title: Boon of Combat Prowess
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_boon-of-combat-prowess/
+        key: srd-2024_boon-of-combat-prowess
+        has_prerequisite: true
+        benefits:
+          - desc: Increase one ability score of your choice by 1, to a maximum of 30.
+          - desc: When you miss with an attack roll, you can hit instead. Once you use this
+              benefit, you can't use it again until the start of your next turn.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Boon of Combat Prowess
+        desc: You gain the following benefits.
+        prerequisite: Level 19+
+        type: Epic Boon
+    - id: srd-2024_boon-of-dimensional-travel
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_boon-of-dimensional-travel
+      title: Boon of Dimensional Travel
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_boon-of-dimensional-travel/
+        key: srd-2024_boon-of-dimensional-travel
+        has_prerequisite: true
+        benefits:
+          - desc: Increase one ability score of your choice by 1, to a maximum of 30.
+          - desc: Immediately after you take the Attack action or the Magic action, you can
+              teleport up to 30 feet to an unoccupied space you can see.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Boon of Dimensional Travel
+        desc: You gain the following benefits.
+        prerequisite: Level 19+
+        type: Epic Boon
+    - id: srd-2024_boon-of-fate
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_boon-of-fate
+      title: Boon of Fate
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_boon-of-fate/
+        key: srd-2024_boon-of-fate
+        has_prerequisite: true
+        benefits:
+          - desc: Increase one ability score of your choice by 1, to a maximum of 30.
+          - desc: When you or another creature within 60 feet of you succeeds on or fails a
+              D20 Test, you can roll 2d4 and apply the total rolled as a bonus
+              or penalty to the d20 roll. Once you use this benefit, you can't
+              use it again until you roll Initiative or finish a Short or Long
+              Rest.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Boon of Fate
+        desc: You gain the following benefits.
+        prerequisite: Level 19+
+        type: Epic Boon
+    - id: srd-2024_boon-of-irresistible-offense
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_boon-of-irresistible-offense
+      title: Boon of Irresistible Offense
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_boon-of-irresistible-offense/
+        key: srd-2024_boon-of-irresistible-offense
+        has_prerequisite: true
+        benefits:
+          - desc: Increase one ability score of your choice by 1, to a maximum of 30.
+          - desc: The Bludgeoning, Piercing, and Slashing damage you deal always ignores
+              Resistance.
+          - desc: When you roll a 20 on the d20 for an attack roll, you can deal extra
+              damage to the target equal to the ability score increased by this
+              feat. The extra damage's type is the same as the attack's type.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Boon of Irresistible Offense
+        desc: You gain the following benefits.
+        prerequisite: Level 19+
+        type: Epic Boon
+    - id: srd-2024_boon-of-spell-recall
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_boon-of-spell-recall
+      title: Boon of Spell Recall
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_boon-of-spell-recall/
+        key: srd-2024_boon-of-spell-recall
+        has_prerequisite: true
+        benefits:
+          - desc: Increase one ability score of your choice by 1, to a maximum of 30.
+          - desc: Whenever you cast a spell with a level 1–4 spell slot, roll 1d4. If the
+              number you roll is the same as the slot's level, the slot isn't
+              expended.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Boon of Spell Recall
+        desc: You gain the following benefits.
+        prerequisite: Level 19+, Spellcasting Feature
+        type: Epic Boon
+    - id: srd-2024_boon-of-the-night-spirit
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_boon-of-the-night-spirit
+      title: Boon of the Night Spirit
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_boon-of-the-night-spirit/
+        key: srd-2024_boon-of-the-night-spirit
+        has_prerequisite: true
+        benefits:
+          - desc: Increase one ability score of your choice by 1, to a maximum of 30.
+          - desc: While within Dim Light or Darkness, you can give yourself the Invisible
+              condition as a Bonus Action. The condition ends on you immediately
+              after you take an action, a Bonus Action, or a Reaction.
+          - desc: While within Dim Light or Darkness, you have Resistance to all damage
+              except Psychic and Radiant.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Boon of the Night Spirit
+        desc: You gain the following benefits.
+        prerequisite: Level 19+
+        type: Epic Boon
+    - id: srd-2024_boon-of-truesight
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_boon-of-truesight
+      title: Boon of the Truesight
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_boon-of-truesight/
+        key: srd-2024_boon-of-truesight
+        has_prerequisite: true
+        benefits:
+          - desc: Increase one ability score of your choice by 1, to a maximum of 30.
+          - desc: You have Truesight with a range of 60 feet.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Boon of the Truesight
+        desc: You gain the following benefits.
+        prerequisite: Level 19+
+        type: Epic Boon
+    - id: srd-2024_defense
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_defense
+      title: Defense
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_defense/
+        key: srd-2024_defense
+        has_prerequisite: true
+        benefits:
+          - desc: While you're wearing Light, Medium, or Heavy armor, you gain a +1 bonus to
+              Armor Class.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Defense
+        desc: ""
+        prerequisite: Fighting Style Feature
+        type: Fighting Style
+    - id: srd-2024_grappler
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_grappler
+      title: Grappler
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_grappler/
+        key: srd-2024_grappler
+        has_prerequisite: true
+        benefits:
+          - desc: Increase your Strength or Dexterity score by 1, to a maximum of 20.
+          - desc: When you hit a creature with an Unarmed Strike as part of the Attack
+              action on your turn, you can use both the Damage and the Grapple
+              option. You can use this benefit only once per turn.
+          - desc: You have Advantage on attack rolls against a creature Grappled by you.
+          - desc: You don't have to spend extra movement to move a creature Grappled by you
+              if the creature is your size or smaller.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Grappler
+        desc: You gain the following benefits.
+        prerequisite: Level 4+, Strength or Dexterity 13+
+        type: General
+    - id: srd-2024_great-weapon-fighting
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_great-weapon-fighting
+      title: Great Weapon Fighting
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_great-weapon-fighting/
+        key: srd-2024_great-weapon-fighting
+        has_prerequisite: true
+        benefits:
+          - desc: When you roll damage for an attack you make with a Melee weapon that you
+              are holding with two hands, you can treat any 1 or 2 on a damage
+              die as a 3. The weapon must have the Two-Handed or Versatile
+              property to gain this benefit.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Great Weapon Fighting
+        desc: ""
+        prerequisite: Fighting Style Feature
+        type: Fighting Style
+    - id: srd-2024_magic-initiate
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_magic-initiate
+      title: Magic Initiate
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_magic-initiate/
+        key: srd-2024_magic-initiate
+        has_prerequisite: false
+        benefits:
+          - desc: You learn two cantrips of your choice from the Cleric, Druid, or Wizard
+              spell list. Intelligence, Wisdom, or Charisma is your spellcasting
+              ability for this feat's spells (choose when you select this feat).
+          - desc: Choose a level 1 spell from the same list you selected for this feat's
+              cantrips. You always have that spell prepared. You can cast it
+              once without a spell slot, and you regain the ability to cast it
+              in that way when you finish a Long Rest. You can also cast the
+              spell using any spell slots you have.
+          - desc: Whenever you gain a new level, you can replace one of the spells you chose
+              for this feat with a different spell of the same level from the
+              chosen spell list.
+          - desc: You can take this feat more than once, but you must choose a different
+              spell list each time.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Magic Initiate
+        desc: You gain the following benefits.
+        prerequisite: ""
+        type: Origin
+    - id: srd-2024_savage-attacker
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_savage-attacker
+      title: Savage Attacker
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_savage-attacker/
+        key: srd-2024_savage-attacker
+        has_prerequisite: false
+        benefits:
+          - desc: You've trained to deal particularly damaging strikes. Once per turn when
+              you hit a target with a weapon, you can roll the weapon's damage
+              dice twice and use either roll against the target.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Savage Attacker
+        desc: ""
+        prerequisite: ""
+        type: Origin
+    - id: srd-2024_skilled
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_skilled
+      title: Skilled
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_skilled/
+        key: srd-2024_skilled
+        has_prerequisite: false
+        benefits:
+          - desc: You gain proficiency in any combination of three skills or tools of your
+              choice.
+          - desc: You can take this feat more than once.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Skilled
+        desc: ""
+        prerequisite: ""
+        type: Origin
+    - id: srd-2024_two-weapon-fighting
+      contentId:
+        namespace: srd_2024
+        type: feat
+        slug: srd-2024_two-weapon-fighting
+      title: Two-Weapon Fighting
+      data:
+        url: https://api.open5e.com/v2/feats/srd-2024_two-weapon-fighting/
+        key: srd-2024_two-weapon-fighting
+        has_prerequisite: true
+        benefits:
+          - desc: When you make an extra attack as a result of using a weapon that has the
+              Light property, you can add your ability modifier to the damage of
+              that attack if you aren't already adding it to the damage.
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Two-Weapon Fighting
+        desc: ""
+        prerequisite: Fighting Style Feature
+        type: Fighting Style

@@ -1,0 +1,15 @@
+creatorRules:
+  schemaVersion: "3.0.0"
+  rules:
+    - id: level-range
+      severity: error
+      when: "level_total < 1 or level_total > 20"
+      message: "Total character level must be between 1 and 20."
+    - id: no-class-selected
+      severity: error
+      when: "size(class_plan) < 1"
+      message: "Select at least one class in the level plan."
+    - id: missing-spells-warning
+      severity: warning
+      when: "level_total >= 1 and size(spell_ids) == 0"
+      message: "No spells selected. Proceed only if this build should be non-caster."

@@ -1,0 +1,171 @@
+content:
+  backgrounds:
+    - id: srd-2024_acolyte
+      contentId:
+        namespace: srd_2024
+        type: background
+        slug: srd-2024_acolyte
+      title: Acolyte
+      data:
+        url: https://api.open5e.com/v2/backgrounds/srd-2024_acolyte/
+        key: srd-2024_acolyte
+        benefits:
+          - name: Ability Scores
+            desc: Intelligence, Wisdom, Charisma
+            type: ability_score
+          - name: Equipment
+            desc: "*Choose A or B:* (A) Calligrapher's Supplies, Book (prayers), Holy
+              Symbol, Parchment (10 sheets), Robe, 8 GP; or (B) 50 GP"
+            type: equipment
+          - name: Feat
+            desc: Magic Initiate (Cleric)
+            type: feat
+          - name: Skill Proficiencies
+            desc: Insight and Religion
+            type: skill_proficiency
+          - name: Tool Proficiency
+            desc: Calligrapher's Supplies
+            type: tool_proficiency
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Acolyte
+        desc: ""
+    - id: srd-2024_criminal
+      contentId:
+        namespace: srd_2024
+        type: background
+        slug: srd-2024_criminal
+      title: Criminal
+      data:
+        url: https://api.open5e.com/v2/backgrounds/srd-2024_criminal/
+        key: srd-2024_criminal
+        benefits:
+          - name: Ability Scores
+            desc: Dexterity, Constitution, Intelligence
+            type: ability_score
+          - name: Equipment
+            desc: "*Choose A or B:* (A) 2 Daggers, Thieves' Tools, Crowbar, 2 Pouches,
+              Traveler's Clothes, 16 GP; or (B) 50 GP"
+            type: equipment
+          - name: Feat
+            desc: Alert
+            type: feat
+          - name: Skill Proficiencies
+            desc: Sleight of Hand and Stealth
+            type: skill_proficiency
+          - name: Tool Proficiency
+            desc: Thieves' Tools
+            type: tool_proficiency
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Criminal
+        desc: ""
+    - id: srd-2024_sage
+      contentId:
+        namespace: srd_2024
+        type: background
+        slug: srd-2024_sage
+      title: Sage
+      data:
+        url: https://api.open5e.com/v2/backgrounds/srd-2024_sage/
+        key: srd-2024_sage
+        benefits:
+          - name: Ability Scores
+            desc: Constitution, Intelligence, Wisdom
+            type: ability_score
+          - name: Equipment
+            desc: "*Choose A or B:* (A) Quarterstaff, Calligrapher's Supplies, Book
+              (history), Parchment (8 sheets), Robe, 8 GP; or (B) 50 GP"
+            type: equipment
+          - name: Feat
+            desc: Magic Initiate (Wizard)
+            type: feat
+          - name: Skill Proficiencies
+            desc: Arcana and History
+            type: skill_proficiency
+          - name: Tool Proficiency
+            desc: Calligrapher's Supplies
+            type: tool_proficiency
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Sage
+        desc: ""
+    - id: srd-2024_soldier
+      contentId:
+        namespace: srd_2024
+        type: background
+        slug: srd-2024_soldier
+      title: Soldier
+      data:
+        url: https://api.open5e.com/v2/backgrounds/srd-2024_soldier/
+        key: srd-2024_soldier
+        benefits:
+          - name: Ability Scores
+            desc: Strength, Dexterity, Constitution
+            type: ability_score
+          - name: Equipment
+            desc: "*Choose A or B:* (A) Spear, Shortbow, 20 Arrows, Gaming Set (same as
+              above), Healer's Kit, Quiver, Traveler's Clothes, 14 GP; or (B) 50
+              GP"
+            type: equipment
+          - name: Feat
+            desc: Savage Attacker
+            type: feat
+          - name: Skill Proficiencies
+            desc: Athletics and Intimidation
+            type: skill_proficiency
+          - name: Tool Proficiency
+            desc: Choose one kind of Gaming Set
+            type: tool_proficiency
+        document:
+          name: System Reference Document 5.2
+          key: srd-2024
+          type: SOURCE
+          display_name: 5e 2024 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2024
+            key: "5e-2024"
+            url: https://api.open5e.com/v2/gamesystems/5e-2024/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Soldier
+        desc: ""

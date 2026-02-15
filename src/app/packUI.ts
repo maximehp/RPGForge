@@ -11,10 +11,10 @@ export type UIAction =
 export type ActionRegistry = Map<string, UIAction>;
 
 /* Vite will inline these as raw strings */
-const panelsGlobs = import.meta.glob("/src/packs/builtin/**/ui/panels.@(yaml|yml|json)", { query: "?raw", import: "default" });
-const layoutGlobs = import.meta.glob("/src/packs/builtin/**/ui/layout.json", { query: "?raw", import: "default" });
-const themeGlobs = import.meta.glob("/src/packs/builtin/**/ui/theme.css", { query: "?raw", import: "default" });
-const actionsGlobs = import.meta.glob("/src/packs/builtin/**/ui/actions.@(yaml|yml|json)", { query: "?raw", import: "default" });
+const panelsGlobs = import.meta.glob("/src/packs/builtin/**/ui/panels.@(yaml|yml|json)", { query: "?raw", import: "default" }) as Record<string, () => Promise<string>>;
+const layoutGlobs = import.meta.glob("/src/packs/builtin/**/ui/layout.json", { query: "?raw", import: "default" }) as Record<string, () => Promise<string>>;
+const themeGlobs = import.meta.glob("/src/packs/builtin/**/ui/theme.css", { query: "?raw", import: "default" }) as Record<string, () => Promise<string>>;
+const actionsGlobs = import.meta.glob("/src/packs/builtin/**/ui/actions.@(yaml|yml|json)", { query: "?raw", import: "default" }) as Record<string, () => Promise<string>>;
 
 export type PackUI = {
     panels: PanelRegistry;

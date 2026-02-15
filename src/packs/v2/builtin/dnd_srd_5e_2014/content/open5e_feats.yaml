@@ -1,0 +1,37 @@
+content:
+  feats:
+    - id: srd_grappler
+      contentId:
+        namespace: srd_2014
+        type: feat
+        slug: srd_grappler
+      title: Grappler
+      data:
+        url: https://api.open5e.com/v2/feats/srd_grappler/
+        key: srd_grappler
+        has_prerequisite: true
+        benefits:
+          - desc: You have advantage on attack rolls against a creature you are grappling.
+          - desc: You can use your action to try to pin a creature grappled by you. The
+              creature makes a Strength or Dexterity saving throw against your
+              maneuver DC. On a failure, you and the creature are both
+              restrained until the grapple ends.
+        document:
+          name: System Reference Document 5.1
+          key: srd-2014
+          type: SOURCE
+          display_name: 5e 2014 Rules
+          publisher:
+            name: Wizards of the Coast
+            key: wizards-of-the-coast
+            url: https://api.open5e.com/v2/publishers/wizards-of-the-coast/
+          gamesystem:
+            name: 5th Edition 2014
+            key: "5e-2014"
+            url: https://api.open5e.com/v2/gamesystems/5e-2014/
+          permalink: https://dnd.wizards.com/resources/systems-reference-document
+        name: Grappler
+        desc: "You've developed the skills necessary to hold your own in close-quarters
+          grappling. You gain the following benefits:"
+        prerequisite: Strength 13 or higher
+        type: GENERAL

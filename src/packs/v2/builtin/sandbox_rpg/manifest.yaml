@@ -1,0 +1,13 @@
+schemaVersion: "2.0.0"
+id: sandbox_rpg
+name: Sandbox RPG Demo
+version: 2.0.0
+kind: core
+description: Generic non-D&D reference pack proving system-agnostic runtime behavior.
+entrypoints:
+  model: schema/model.yaml
+  rules: rules/rules.yaml
+  content:
+    - content/entities.yaml
+  ui: ui/ui.yaml
+  actions: ui/actions.yaml

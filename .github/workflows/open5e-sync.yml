@@ -1,0 +1,28 @@
+name: Open5e SRD Sync
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install
+        run: npm ci
+      - name: Sync Open5e SRD
+        run: npm run sync:open5e
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test
+      - name: Upload sync report
+        uses: actions/upload-artifact@v4
+        with:
+          name: open5e-sync-report
+          path: docs/open5e-sync/latest-report.json

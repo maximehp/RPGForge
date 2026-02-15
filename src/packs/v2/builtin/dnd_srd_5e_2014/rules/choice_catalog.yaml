@@ -1,0 +1,32 @@
+choiceCatalog:
+  abilities:
+    - str
+    - dex
+    - con
+    - int
+    - wis
+    - cha
+  skills:
+    - acrobatics
+    - animal_handling
+    - arcana
+    - athletics
+    - deception
+    - history
+    - insight
+    - intimidation
+    - investigation
+    - medicine
+    - nature
+    - perception
+    - performance
+    - persuasion
+    - religion
+    - sleight_of_hand
+    - stealth
+    - survival
+  abilityMethods:
+    - roll
+    - point_buy
+    - standard_array
+    - manual

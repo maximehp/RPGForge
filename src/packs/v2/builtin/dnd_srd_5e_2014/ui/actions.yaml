@@ -1,0 +1,49 @@
+actions:
+  - id: setAttribute
+    kind: domain
+    target: setStat
+  - id: setResourceCurrent
+    kind: domain
+    target: setResourceCurrent
+  - id: setLevel
+    kind: domain
+    target: setLevel
+  - id: shortRest
+    kind: domain
+    target: shortRest
+  - id: longRest
+    kind: domain
+    target: longRest
+  - id: recompute
+    kind: domain
+    target: recompute
+  - id: rollCheck
+    kind: roll
+    target: "roll('1d20') + derived.str_mod"
+  - id: roll
+    kind: roll
+    target: "roll('1d20') + derived.str_mod"
+  - id: toggleVar
+    kind: domain
+    target: toggleFlag
+  - id: toggleHex
+    kind: toggle
+    target: hex_active
+  - id: createEntity
+    kind: domain
+    target: createEntity
+  - id: updateEntity
+    kind: domain
+    target: updateEntity
+  - id: deleteEntity
+    kind: domain
+    target: deleteEntity
+  - id: equipEntity
+    kind: domain
+    target: equipEntity
+  - id: unequipEntity
+    kind: domain
+    target: unequipEntity
+  - id: applyTemplate
+    kind: domain
+    target: applyTemplate

@@ -1,0 +1,12 @@
+content:
+  features:
+    - id: darkvision
+      contentId: { namespace: srd5e, type: feature, slug: darkvision }
+      title: Darkvision
+      data:
+        range: 60
+    - id: second_wind
+      contentId: { namespace: srd5e, type: feature, slug: second_wind }
+      title: Second Wind
+      data:
+        recharge: short_rest

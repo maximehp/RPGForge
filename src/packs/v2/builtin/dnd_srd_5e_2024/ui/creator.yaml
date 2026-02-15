@@ -1,0 +1,35 @@
+creator:
+  schemaVersion: "3.0.0"
+  title: D&D SRD 2024 Character Creator
+  description: Build a 2024 SRD character from pack-defined creator V3 steps.
+  steps:
+    - id: identity
+      title: Identity
+      fields:
+        - id: name
+          label: Character Name
+          type: text
+          required: true
+          bindTo: name
+          default: New Adventurer
+        - id: level
+          label: Starting Level
+          type: number
+          bindTo: level
+          required: true
+          default: 1
+    - id: notes
+      title: Notes
+      fields:
+        - id: notes
+          label: Starting Notes
+          type: text
+          bindTo: notes
+    - id: review
+      title: Review
+      fields:
+        - id: review_ack
+          label: I reviewed this character
+          type: toggle
+          bindTo: review_ack
+          required: true

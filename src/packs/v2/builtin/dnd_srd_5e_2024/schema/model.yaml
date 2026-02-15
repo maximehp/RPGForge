@@ -1,0 +1,20 @@
+model:
+  core:
+    stats:
+      - { id: str, label: Strength, default: 10 }
+      - { id: dex, label: Dexterity, default: 10 }
+      - { id: con, label: Constitution, default: 10 }
+      - { id: int, label: Intelligence, default: 10 }
+      - { id: wis, label: Wisdom, default: 10 }
+      - { id: cha, label: Charisma, default: 10 }
+    resources:
+      - { id: hp, label: Hit Points, default: 10, maxFormula: "10 + floor((stats.con - 10) / 2) * level" }
+      - { id: hit_dice, label: Hit Dice, default: 1, maxFormula: "level" }
+    collections:
+      - { id: inventory, label: Inventory, itemType: item }
+      - { id: spells, label: Spells, itemType: spell }
+      - { id: classes, label: Classes, itemType: class }
+      - { id: features, label: Features, itemType: feature }
+      - { id: activity_log, label: Activity Log, itemType: event }
+    flags:
+      - { id: hex_active, label: Hex Active, default: false }

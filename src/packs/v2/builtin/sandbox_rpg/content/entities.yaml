@@ -1,0 +1,14 @@
+content:
+  modules:
+    - id: grappling_hook
+      contentId: { namespace: sandbox, type: module, slug: grappling_hook }
+      title: Grappling Hook
+      data:
+        slot: utility
+        mass: 2
+    - id: pulse_rifle
+      contentId: { namespace: sandbox, type: module, slug: pulse_rifle }
+      title: Pulse Rifle
+      data:
+        slot: weapon
+        mass: 5

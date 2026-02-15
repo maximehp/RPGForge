@@ -1,0 +1,8 @@
+rules:
+  formulas:
+    derived.mobility: "stats.agility + hook('count', collections.loadout.length)"
+    derived.tech_rating: "stats.tech * 2 + (flags.overclocked ? 3 : 0)"
+    derived.damage_floor: "max(1, floor(stats.power / 2))"
+  hooks:
+    count: "builtin:count"
+    max: "builtin:max"

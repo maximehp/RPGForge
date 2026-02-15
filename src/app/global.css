@@ -1,0 +1,807 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap");
+
+:root {
+    --bg-0: #0e1a2a;
+    --bg-1: #1b2f49;
+    --bg-2: #223d61;
+    --glass: rgba(18, 35, 52, 0.52);
+    --glass-strong: rgba(18, 35, 52, 0.72);
+    --line: rgba(255, 255, 255, 0.22);
+    --text: #edf7ff;
+    --muted: #bed2e8;
+    --accent-a: #49d7d9;
+    --accent-b: #ffa45a;
+    --danger: #ff6f7c;
+    --shadow: 0 24px 60px rgba(2, 10, 20, 0.38);
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: "Manrope", "Segoe UI", sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(1200px 800px at 15% 5%, rgba(73, 215, 217, 0.22), transparent 55%),
+        radial-gradient(1000px 700px at 90% 10%, rgba(255, 164, 90, 0.2), transparent 50%),
+        linear-gradient(150deg, var(--bg-0), var(--bg-1) 55%, var(--bg-2));
+}
+
+button, input, select {
+    font-family: inherit;
+}
+
+.app-shell {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 14px;
+    height: 100%;
+    padding: 14px;
+}
+
+.app-main {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.app-main > :not(.error-banner) {
+    min-height: 0;
+    flex: 1 1 auto;
+}
+
+.glass-surface {
+    background: var(--glass);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(16px) saturate(130%);
+    box-shadow: var(--shadow);
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 18px;
+}
+
+.title-block h1 {
+    margin: 0;
+    font-family: "Space Grotesk", "Manrope", sans-serif;
+    letter-spacing: 0.02em;
+    font-size: 1.35rem;
+}
+
+.title-block p {
+    margin: 2px 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.topbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.topbar label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.82rem;
+}
+
+.topbar select,
+.topbar input[type="file"] {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 8px 10px;
+}
+
+.error-banner {
+    border: 1px solid rgba(255, 111, 124, 0.45);
+    background: rgba(255, 111, 124, 0.17);
+    color: #ffe2e6;
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+}
+
+.loading-state {
+    display: grid;
+    place-items: center;
+    min-height: 40vh;
+    color: var(--muted);
+}
+
+.home-shell {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+}
+
+.home-card {
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+}
+
+.home-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.home-card-header h2 {
+    margin: 0;
+    font-family: "Space Grotesk", "Manrope", sans-serif;
+    font-size: 1rem;
+}
+
+.home-muted {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.home-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.character-list {
+    display: grid;
+    gap: 8px;
+}
+
+.character-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.character-row h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.character-row p {
+    margin: 4px 0;
+    color: var(--muted);
+}
+
+.character-row small {
+    color: var(--muted);
+}
+
+.character-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.browser-shell {
+    padding: 14px;
+    display: grid;
+    gap: 12px;
+}
+
+.browser-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.browser-header h2 {
+    margin: 0;
+    font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.browser-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.browser-filters label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.86rem;
+}
+
+.browser-filters input,
+.browser-filters select {
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    padding: 8px 10px;
+}
+
+.toggle-inline {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.browser-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.error-actions {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.dockview-shell {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background: transparent;
+    padding: 0;
+}
+
+.dockview-shell .dv-layout {
+    background: transparent !important;
+}
+
+.dockview-shell .dockview-theme-rpgforge {
+    height: 100%;
+    padding: 0;
+    background: transparent;
+    --dv-border-radius: var(--radius-lg);
+    --dv-tab-margin: 0;
+    --dv-floating-box-shadow: var(--shadow);
+    --dv-group-view-background-color: transparent;
+    --dv-tabs-and-actions-container-background-color: transparent;
+    --dv-activegroup-visiblepanel-tab-background-color: rgba(73, 215, 217, 0.2);
+    --dv-activegroup-hiddenpanel-tab-background-color: rgba(255, 255, 255, 0.1);
+    --dv-inactivegroup-visiblepanel-tab-background-color: rgba(255, 255, 255, 0.16);
+    --dv-inactivegroup-hiddenpanel-tab-background-color: rgba(255, 255, 255, 0.08);
+    --dv-tab-divider-color: transparent;
+    --dv-separator-border: transparent;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-resize-container {
+    border: none !important;
+    border-radius: var(--radius-lg) !important;
+    background: transparent !important;
+    backdrop-filter: none;
+    box-shadow: none !important;
+    overflow: hidden;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-split-view-container,
+.dockview-shell .dockview-theme-rpgforge .dv-split-view-container .dv-view-container {
+    overflow: visible;
+    background: transparent !important;
+}
+
+.dockview-shell .dockview-theme-rpgforge.dv-dockview,
+.dockview-shell .dockview-theme-rpgforge .dv-root-wrapper,
+.dockview-shell .dockview-theme-rpgforge .dv-grid-view,
+.dockview-shell .dockview-theme-rpgforge .dv-branch-node {
+    background: transparent !important;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-split-view-container.dv-horizontal > .dv-view-container > .dv-view {
+    padding: 0 0 0 5px;
+    background: transparent;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-split-view-container.dv-horizontal > .dv-view-container > .dv-view:first-child {
+    padding-left: 0;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-split-view-container.dv-vertical > .dv-view-container > .dv-view {
+    padding: 5px 0 0;
+    background: transparent;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-split-view-container.dv-vertical > .dv-view-container > .dv-view:first-child {
+    padding-top: 0;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-split-view-container .dv-view-container .dv-view > .dv-resize-container {
+    border-radius: var(--radius-lg) !important;
+    overflow: hidden !important;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-split-view-container .dv-view-container .dv-view > .dv-resize-container > .dv-groupview,
+.dockview-shell .dockview-theme-rpgforge .dv-groupview {
+    margin: 0;
+    border: 1px solid var(--line) !important;
+    border-radius: var(--radius-lg) !important;
+    overflow: hidden;
+    background: var(--glass) !important;
+    box-shadow: var(--shadow) !important;
+    backdrop-filter: blur(16px) saturate(130%);
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-groupview .dv-tabs-and-actions-container,
+.dockview-shell .dockview-theme-rpgforge .dv-groupview .dv-content-container {
+    background: transparent !important;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-tab {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 0 !important;
+    margin: 0 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-active-tab {
+    background: rgba(73, 215, 217, 0.2);
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-groupview .dv-tabs-and-actions-container {
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-groupview .dv-tabs-and-actions-container .dv-tabs-container {
+    gap: 0;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-groupview .dv-tabs-and-actions-container .dv-tabs-container > .dv-tab:first-child {
+    border-top-left-radius: var(--radius-lg) !important;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-groupview .dv-tabs-and-actions-container .dv-tabs-container > .dv-tab:last-child {
+    border-top-right-radius: var(--radius-lg) !important;
+    border-right: none;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-tab .dv-default-tab {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-tab .dv-default-tab .dv-default-tab-content {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+}
+
+.dockview-shell .dockview-theme-rpgforge .dv-sash {
+    background: transparent !important;
+}
+
+/* Hide tab close affordance in all states, including drag preview tabs rendered outside shell scope. */
+.dv-tab .dv-default-tab .dv-default-tab-action,
+.dv-tab.dv-active-tab .dv-default-tab .dv-default-tab-action,
+.dv-tab.dv-inactive-tab .dv-default-tab .dv-default-tab-action,
+.dv-tab.dv-tab-dragging .dv-default-tab-action {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    background: transparent !important;
+}
+
+.glass-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    padding: 12px;
+    background: transparent;
+}
+
+.glass-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.glass-panel-header h3 {
+    margin: 0;
+    font-family: "Space Grotesk", "Manrope", sans-serif;
+    font-size: 1rem;
+}
+
+.glass-collapse,
+.glass-btn {
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.glass-btn:hover,
+.glass-collapse:hover {
+    border-color: var(--accent-a);
+}
+
+.glass-btn.secondary {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.glass-panel-body {
+    display: grid;
+    gap: 8px;
+    align-content: start;
+    overflow: auto;
+    padding-right: 4px;
+}
+
+.glass-value {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+}
+
+.glass-value label {
+    color: var(--muted);
+}
+
+.glass-input {
+    display: grid;
+    gap: 6px;
+}
+
+.glass-input input {
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    padding: 8px 10px;
+}
+
+.glass-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+}
+
+.glass-bar {
+    display: grid;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 8px;
+}
+
+.glass-bar-track {
+    height: 10px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.glass-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+}
+
+.glass-list {
+    display: grid;
+    gap: 6px;
+}
+
+.glass-action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.glass-list-row {
+    display: grid;
+    gap: 6px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.glass-empty {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.mobile-shell {
+    display: grid;
+    gap: 10px;
+    height: 100%;
+}
+
+.mobile-sections {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.mobile-sections button {
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    padding: 8px 12px;
+}
+
+.mobile-sections button.is-active {
+    border-color: var(--accent-a);
+    background: rgba(73, 215, 217, 0.22);
+}
+
+.mobile-panel-wrap {
+    min-height: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    overflow: auto;
+}
+
+.workspace-fallback {
+    padding: 14px;
+    display: grid;
+    gap: 12px;
+}
+
+.workspace-fallback-header h2 {
+    margin: 0;
+    font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.workspace-fallback-header p {
+    margin: 6px 0 0;
+}
+
+.workspace-fallback-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.workspace-fallback-card {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 10px;
+}
+
+.workspace-fallback-card h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+}
+
+.workspace-fallback-card p {
+    margin: 6px 0;
+    color: var(--muted);
+}
+
+.creator-shell {
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+.creator-header h2,
+.creator-step h3 {
+    margin: 0;
+    font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.creator-header p {
+    margin: 6px 0 0;
+    color: var(--muted);
+}
+
+.creator-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+}
+
+.creator-field {
+    display: grid;
+    gap: 6px;
+}
+
+.creator-field input,
+.creator-field select {
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    padding: 8px 10px;
+}
+
+.creator-field.toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+}
+
+.creator-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.creator-error {
+    color: #ffd4d9;
+    font-size: 0.8rem;
+}
+
+.creator-review {
+    display: grid;
+    gap: 10px;
+}
+
+.creator-review-group {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.creator-review-group h4 {
+    margin: 0 0 6px;
+}
+
+.creator-review-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--muted);
+}
+
+.creator-issues {
+    display: grid;
+    gap: 4px;
+}
+
+.creator-repeat-group {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.creator-repeat-head,
+.creator-repeat-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.creator-repeat-rows {
+    display: grid;
+    gap: 10px;
+}
+
+.creator-repeat-row {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.creator-warning-modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.48);
+    z-index: 20;
+    padding: 14px;
+}
+
+.creator-warning-dialog {
+    width: min(560px, 100%);
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+}
+
+.homebrew-shell {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 14px;
+    display: grid;
+    gap: 12px;
+}
+
+.homebrew-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.homebrew-header h2 {
+    margin: 0;
+    font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.homebrew-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.homebrew-grid label,
+.homebrew-json {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+}
+
+.homebrew-grid input,
+.homebrew-grid select,
+.homebrew-json textarea {
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    padding: 8px 10px;
+}
+
+@media (max-width: 1024px) {
+    .topbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .topbar-controls {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .glass-surface,
+    .dockview-shell,
+    .mobile-panel-wrap {
+        backdrop-filter: none;
+        background: rgba(26, 40, 58, 0.96);
+    }
+}

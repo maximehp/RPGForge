@@ -1,0 +1,40 @@
+authoring:
+  enabled: true
+  contentTypes: [items, spells, features, classes]
+  templates:
+    - id: custom_stat_item
+      label: Custom Stat Item
+      contentType: items
+      collectionId: inventory
+      defaults:
+        title: Custom Item
+        equipped: false
+        effects:
+          - id: custom_item_bonus
+            label: Custom item stat bonus
+            modifiers:
+              - target: stat
+                key: str
+                operation: add
+                value: 1
+                stacking: sum
+            triggers:
+              - kind: equipped
+            duration:
+              type: while_equipped
+            stacking: sum
+  forms:
+    - id: item_basic
+      contentType: items
+      title: Item Editor
+      fields:
+        - id: title
+          label: Name
+          type: text
+          required: true
+        - id: weight
+          label: Weight
+          type: number
+        - id: equipped
+          label: Equipped
+          type: boolean

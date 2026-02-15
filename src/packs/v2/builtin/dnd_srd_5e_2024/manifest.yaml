@@ -1,0 +1,28 @@
+schemaVersion: "2.0.0"
+id: dnd_srd_5e_2024
+name: D&D SRD 5e 2024
+version: 2.0.0
+kind: core
+description: Default SRD core ruleset with extensible model for addon books and homebrew.
+sourceLicense: CC-BY-4.0
+sourceUrl: https://api.open5e.com/v2/documents/srd-2024/
+entrypoints:
+  model: schema/model.yaml
+  rules: rules/rules.yaml
+  content:
+    - content/items.yaml
+    - content/spells.yaml
+    - content/features.yaml
+    - content/open5e_spells.yaml
+    - content/open5e_classes.yaml
+    - content/open5e_feats.yaml
+    - content/open5e_conditions.yaml
+    - content/open5e_items.yaml
+    - content/open5e_backgrounds.yaml
+    - content/open5e_monsters.yaml
+    - content/open5e_races.yaml
+  ui: ui/ui.yaml
+  actions: ui/actions.yaml
+  creator: ui/creator.yaml
+  authoring: ui/authoring.yaml
+  effects: rules/effects.generated.yaml

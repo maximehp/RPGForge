@@ -1,0 +1,185 @@
+ui:
+  accents:
+    primary: "#49d7d9"
+    secondary: "#ffa45a"
+    surfaceTint: "rgba(34, 50, 74, 0.45)"
+  layout:
+    groups:
+      - id: identity
+        title: Identity
+        tabs: [sheet.header, sheet.attributes, sheet.resources]
+      - id: combat
+        title: Combat
+        tabs: [sheet.derived, sheet.actions]
+      - id: journal
+        title: Journal
+        tabs: [sheet.inventory, sheet.notes]
+  panels:
+    - id: sheet.header
+      title: Character
+      section: identity
+      collapsible: false
+      elements:
+        - kind: text
+          text: "{{ meta.name }}"
+        - kind: text
+          text: "Level {{ level }} • Proficiency +{{ derived.proficiency_bonus }}"
+        - kind: value
+          label: "Armor Class"
+          value: "{{ derived.armor_class }}"
+        - kind: value
+          label: "Initiative"
+          value: "{{ derived.initiative }}"
+    - id: sheet.attributes
+      title: Attributes
+      section: identity
+      collapsible: true
+      elements:
+        - kind: list
+          id: attrs
+          of: attributes
+          row:
+            - kind: text
+              text: "{{ item.key }}"
+            - kind: value
+              value: "{{ item.value }}"
+            - kind: value
+              value: "{{ floor((item.value - 10) / 2) }}"
+            - kind: numberInput
+              id: attr-edit
+              label: "Set"
+              value: "{{ item.value }}"
+              onChange:
+                action: setAttribute
+                key: "{{ item.key }}"
+    - id: sheet.resources
+      title: Resources
+      section: identity
+      collapsible: true
+      elements:
+        - kind: bar
+          label: "HP"
+          current: "resources.hp.current"
+          max: "resources.hp.max"
+          showNumbers: true
+        - kind: numberInput
+          id: hp-set
+          label: "HP Current"
+          value: "resources.hp.current"
+          onChange:
+            action: setResource
+            key: hp
+    - id: sheet.derived
+      title: Combat Stats
+      section: combat
+      collapsible: true
+      elements:
+        - kind: value
+          label: "Carry Capacity"
+          value: "{{ derived.carry_capacity }}"
+        - kind: toggle
+          id: hex-toggle
+          label: "Hex active"
+          value: "{{ flags.hex_active }}"
+          onChange:
+            action: toggleVar
+            key: hex_active
+    - id: sheet.actions
+      title: Actions
+      section: combat
+      collapsible: true
+      elements:
+        - kind: button
+          id: short-rest
+          label: "Short Rest"
+          onClick:
+            action: shortRest
+        - kind: button
+          id: long-rest
+          label: "Long Rest"
+          onClick:
+            action: longRest
+        - kind: button
+          id: roll
+          label: "Roll d20"
+          onClick:
+            action: roll
+            expr: "roll('1d20') + derived.str_mod"
+    - id: sheet.inventory
+      title: Inventory
+      section: journal
+      collapsible: true
+      elements:
+        - kind: actionBar
+          buttons:
+            - id: add-item
+              label: "+ Item"
+              onClick:
+                action: createEntity
+                payload:
+                  collection: inventory
+                  entity:
+                    id: "custom_item_{{ round(roll('1d100000')) }}"
+                    title: "Custom Item"
+                    equipped: false
+            - id: add-bonus-item
+              label: "+ Bonus Item"
+              onClick:
+                action: createEntity
+                payload:
+                  collection: inventory
+                  entity:
+                    id: "bonus_item_{{ round(roll('1d100000')) }}"
+                    title: "Bonus Item"
+                    equipped: false
+                    effects:
+                      - id: bonus_str
+                        label: Strength +1
+                        modifiers:
+                          - target: stat
+                            key: str
+                            operation: add
+                            value: 1
+                            stacking: sum
+                        triggers:
+                          - kind: equipped
+                        duration:
+                          type: while_equipped
+                        stacking: sum
+        - kind: createButton
+          label: "+ Custom Item"
+          action: createEntity
+          collection: inventory
+          contentType: item
+          bonusKey: str
+          bonusValue: 1
+        - kind: list
+          id: inv
+          of: inventory
+          emptyText: "No items"
+          row:
+            - kind: text
+              text: "{{ item.title || item.label || item.id || 'Item' }}"
+            - kind: text
+              text: "{{ item.equipped ? 'Equipped' : 'Unequipped' }}"
+            - kind: button
+              label: Equip
+              onClick:
+                action: equipEntity
+                payload:
+                  collection: inventory
+                  id: "{{ item.id }}"
+            - kind: button
+              label: Unequip
+              onClick:
+                action: unequipEntity
+                payload:
+                  collection: inventory
+                  id: "{{ item.id }}"
+    - id: sheet.notes
+      title: Notes
+      section: journal
+      collapsible: true
+      elements:
+        - kind: text
+          text: "{{ notes || 'No notes yet' }}"

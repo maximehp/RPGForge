@@ -1,0 +1,13 @@
+actions:
+  - id: setAttribute
+    kind: domain
+    target: setStat
+  - id: setResourceCurrent
+    kind: domain
+    target: setResourceCurrent
+  - id: recompute
+    kind: domain
+    target: recompute
+  - id: toggleVar
+    kind: domain
+    target: toggleFlag

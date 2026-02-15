@@ -1,0 +1,35 @@
+{
+  "sync": {
+    "startedAt": "2026-02-14T22:22:19.610Z",
+    "finishedAt": "2026-02-14T22:25:38.737Z",
+    "documents": [
+      "srd-2014",
+      "srd-2024"
+    ],
+    "endpoints": [
+      "spells",
+      "classes",
+      "feats",
+      "conditions",
+      "armor",
+      "weapons",
+      "backgrounds",
+      "creatures",
+      "magicitems",
+      "monsters",
+      "races"
+    ],
+    "pagesFetched": 118,
+    "entitiesTotal": 2693,
+    "warnings": [],
+    "errors": []
+  },
+  "compile": {
+    "generatedAt": "2026-02-14T22:25:37.938Z",
+    "entitiesIn": 2693,
+    "entitiesOut": 2693,
+    "effectsCompiled": 0,
+    "unmappedRules": 0,
+    "warnings": []
+  }
+}

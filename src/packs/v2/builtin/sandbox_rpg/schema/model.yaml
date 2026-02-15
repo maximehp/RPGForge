@@ -1,0 +1,15 @@
+model:
+  core:
+    stats:
+      - { id: power, label: Power, default: 5 }
+      - { id: tech, label: Tech, default: 5 }
+      - { id: agility, label: Agility, default: 5 }
+    resources:
+      - { id: vitality, label: Vitality, default: 20, maxFormula: "20 + stats.power * 2" }
+      - { id: energy, label: Energy, default: 10, maxFormula: "10 + stats.tech" }
+    collections:
+      - { id: loadout, label: Loadout, itemType: module }
+      - { id: quests, label: Quests, itemType: quest }
+      - { id: activity_log, label: Activity Log, itemType: event }
+    flags:
+      - { id: overclocked, label: Overclocked, default: false }

@@ -1,0 +1,81 @@
+ui:
+  accents:
+    primary: "#81f2ff"
+    secondary: "#8fffbf"
+    surfaceTint: "rgba(16, 64, 78, 0.45)"
+  layout:
+    groups:
+      - id: core
+        title: Core
+        tabs: [panel.core, panel.resources]
+      - id: systems
+        title: Systems
+        tabs: [panel.derived, panel.actions]
+      - id: world
+        title: World
+        tabs: [panel.collections]
+  panels:
+    - id: panel.core
+      title: Core Stats
+      section: core
+      collapsible: true
+      elements:
+        - kind: list
+          id: core-stats
+          of: attributes
+          row:
+            - kind: text
+              text: "{{ item.key }}"
+            - kind: value
+              value: "{{ item.value }}"
+    - id: panel.resources
+      title: Resources
+      section: core
+      collapsible: true
+      elements:
+        - kind: bar
+          label: "Vitality"
+          current: "resources.vitality.current"
+          max: "resources.vitality.max"
+          showNumbers: true
+        - kind: bar
+          label: "Energy"
+          current: "resources.energy.current"
+          max: "resources.energy.max"
+          showNumbers: true
+    - id: panel.derived
+      title: Derived
+      section: systems
+      elements:
+        - kind: value
+          label: "Mobility"
+          value: "{{ derived.mobility }}"
+        - kind: value
+          label: "Tech Rating"
+          value: "{{ derived.tech_rating }}"
+    - id: panel.actions
+      title: Controls
+      section: systems
+      elements:
+        - kind: button
+          id: toggle-overclock
+          label: "Toggle Overclock"
+          onClick:
+            action: toggleVar
+            key: overclocked
+        - kind: button
+          id: recompute
+          label: "Recompute"
+          onClick:
+            action: recompute
+    - id: panel.collections
+      title: Collections
+      section: world
+      elements:
+        - kind: list
+          id: loadout-list
+          of: inventory
+          emptyText: "No modules equipped"
+          row:
+            - kind: text
+              text: "{{ item.title || item.id }}"

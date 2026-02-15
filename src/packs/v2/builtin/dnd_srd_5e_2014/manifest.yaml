@@ -1,0 +1,28 @@
+schemaVersion: "2.0.0"
+id: dnd_srd_5e_2014
+name: D&D SRD 5e 2014
+version: 2.0.0
+kind: core
+description: D&D SRD 2014 core pack loaded from Open5e and extensible via overlays.
+sourceLicense: CC-BY-4.0
+sourceUrl: https://api.open5e.com/v2/documents/srd-2014/
+entrypoints:
+  model: schema/model.yaml
+  rules: rules/rules.yaml
+  content:
+    - content/items.yaml
+    - content/spells.yaml
+    - content/features.yaml
+    - content/open5e_spells.yaml
+    - content/open5e_classes.yaml
+    - content/open5e_feats.yaml
+    - content/open5e_conditions.yaml
+    - content/open5e_items.yaml
+    - content/open5e_backgrounds.yaml
+    - content/open5e_monsters.yaml
+    - content/open5e_races.yaml
+  ui: ui/ui.yaml
+  actions: ui/actions.yaml
+  creator: ui/creator.v3.yaml
+  authoring: ui/authoring.yaml
+  effects: rules/effects.generated.yaml
