@@ -16,6 +16,12 @@ This file defines how humans and coding agents should collaborate in this reposi
 - Preserve existing project conventions unless a migration is intentional.
 - Backward compatibility and migrations are not required unless explicitly requested.
 
+## Commit Workflow
+- When a major feature change is completed and the user moves to the next task, treat the previous feature as approved enough to commit.
+- Create a git commit for each major feature milestone before starting the next major feature task.
+- Use descriptive Conventional Commit messages (for example: `feat(creator): add multiclass level planner validation`).
+- Keep commits scoped to the completed feature milestone and avoid mixing unrelated changes.
+
 ## Current Focus (Next Thread)
 - Primary focus is character creator completeness and UX quality.
 - Target experience: pack-driven flow with Roll20-like completeness (level, class/subclass, race, background, feats/ASI, spells, equipment, review).
