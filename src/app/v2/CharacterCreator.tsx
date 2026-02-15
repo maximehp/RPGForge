@@ -97,9 +97,9 @@ function parseFieldValue(field: CreatorFieldV3, raw: string, checked: boolean): 
     if (field.type === "toggle") return checked;
     if (field.type === "number") {
         const trimmed = raw.trim();
-        if (!trimmed) return undefined;
+        if (!trimmed) return "";
         const n = Number(trimmed);
-        return Number.isFinite(n) ? n : undefined;
+        return Number.isFinite(n) ? n : raw;
     }
     return raw;
 }
@@ -144,6 +144,21 @@ function numericFieldBounds(
     }
 
     return { step: 1 };
+}
+
+function hydrationDependencyValue(stepId: string, seed: Record<string, unknown>): string {
+    switch (stepId) {
+        case "ancestry":
+            return JSON.stringify({ race_id: seed.race_id });
+        case "class_plan":
+            return JSON.stringify({ class_plan: seed.class_plan, subclass_plan: seed.subclass_plan });
+        case "spells":
+            return JSON.stringify({ class_plan: seed.class_plan });
+        case "equipment":
+            return JSON.stringify({ class_plan: seed.class_plan, background_id: seed.background_id });
+        default:
+            return "";
+    }
 }
 
 function evaluateVisible(field: CreatorFieldV3, seed: Record<string, unknown>, row?: Record<string, unknown>): boolean {
@@ -313,9 +328,12 @@ export function CharacterCreator(props: Props) {
     const [customError, setCustomError] = React.useState("");
     const [customBusy, setCustomBusy] = React.useState(false);
 
+    const initializedSessionRef = React.useRef<string>("");
     React.useEffect(() => {
+        if (initializedSessionRef.current === props.sessionId) return;
+        initializedSessionRef.current = props.sessionId;
         setSeed(props.initialSeed || {});
-    }, [props.initialSeed]);
+    }, [props.initialSeed, props.sessionId]);
 
     React.useEffect(() => {
         setStepIndex(initialIndex);
@@ -333,13 +351,22 @@ export function CharacterCreator(props: Props) {
         });
     }, [classSyncState]);
 
-    const seedFingerprint = React.useMemo(() => JSON.stringify(seed), [seed]);
+    const activeStepId = React.useMemo(() => {
+        const total = preset.steps.length;
+        const current = preset.steps[Math.min(stepIndex, Math.max(0, total - 1))];
+        return current?.id || "";
+    }, [preset.steps, stepIndex]);
+    const hydrateDependency = React.useMemo(
+        () => hydrationDependencyValue(activeStepId, seed),
+        [activeStepId, seed]
+    );
     React.useEffect(() => {
+        if (!activeStepId) return;
         const timeout = window.setTimeout(() => {
             setSeedHydrateToken(value => value + 1);
-        }, 140);
+        }, 160);
         return () => window.clearTimeout(timeout);
-    }, [seedFingerprint]);
+    }, [activeStepId, hydrateDependency]);
 
     const totalSteps = preset.steps.length;
     const step = preset.steps[Math.min(stepIndex, Math.max(0, totalSteps - 1))];
@@ -358,7 +385,6 @@ export function CharacterCreator(props: Props) {
         const run = async () => {
             try {
                 setLoadingStep(true);
-                await updateCreatorSessionSelection(props.sessionId, seed);
                 const hydrated = await hydrateCreatorStep(props.sessionId, step.id, { limit: 300, offset: 0 });
                 if (cancelled) return;
                 setStepOptions(hydrated.options);
@@ -684,6 +710,30 @@ export function CharacterCreator(props: Props) {
                             const value = getFieldValue(seed, field);
                             const showErrors = Boolean(touched[key]);
                             const error = showErrors ? errors[key] : "";
+                            const topLevelOptionsOverride = (() => {
+                                if (step.id !== "ancestry" || field.id !== "subrace_id") return undefined;
+                                const selectedRaceId = String(getAtPath(seed, "race_id") || "");
+                                if (!selectedRaceId) return [];
+                                const raceOptions = stepOptions.race_id || [];
+                                const race = raceOptions.find(option => option.value === selectedRaceId);
+                                const raceMeta = (race?.meta && typeof race.meta === "object")
+                                    ? race.meta as Record<string, unknown>
+                                    : {};
+                                const raceData = (raceMeta.data && typeof raceMeta.data === "object")
+                                    ? raceMeta.data as Record<string, unknown>
+                                    : {};
+                                const subraces = Array.isArray(raceData.subraces) ? raceData.subraces : [];
+                                const rows: Array<{ value: string; label: string; meta?: Record<string, unknown> }> = [];
+                                for (let index = 0; index < subraces.length; index += 1) {
+                                    const raw = subraces[index];
+                                    const row = (raw && typeof raw === "object") ? raw as Record<string, unknown> : {};
+                                    const valueId = String(row.slug || row.name || `subrace_${index + 1}`).trim();
+                                    const label = String(row.name || valueId || `Subrace ${index + 1}`).trim();
+                                    if (!valueId) continue;
+                                    rows.push({ value: valueId, label, meta: { data: row } });
+                                }
+                                return rows;
+                            })();
 
                             if (field.type !== "repeatGroup") {
                                 return renderPrimitiveField(
@@ -700,7 +750,8 @@ export function CharacterCreator(props: Props) {
                                         } else {
                                             setField(field, id);
                                         }
-                                    }
+                                    },
+                                    topLevelOptionsOverride
                                 );
                             }
 

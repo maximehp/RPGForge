@@ -612,7 +612,7 @@ button, input, select {
 .creator-shell {
     min-height: 0;
     height: 100%;
-    overflow: auto;
+    overflow: hidden;
     padding: 16px 18px 12px;
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto;
@@ -672,6 +672,7 @@ button, input, select {
     gap: 12px;
     align-content: start;
     min-height: 0;
+    overflow: auto;
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--radius-md);
     padding: 14px;
@@ -732,9 +733,7 @@ button, input, select {
 }
 
 .creator-actions-sticky {
-    position: sticky;
-    bottom: 0;
-    z-index: 6;
+    position: static;
     padding: 10px 12px;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: var(--radius-sm);

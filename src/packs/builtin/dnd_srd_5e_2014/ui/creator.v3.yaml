@@ -93,7 +93,7 @@ creator:
               options:
                 kind: content
                 contentType: classes
-                filterExpression: "has(optionMeta.data.subclass_of) and includes(selectedClassIds, optionMeta.data.subclass_of.key)"
+                filterExpression: "has(optionMeta.data.subclass_of)"
         - id: warlock_pact_boon
           label: Warlock Pact Boon
           type: select
