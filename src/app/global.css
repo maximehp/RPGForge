@@ -610,15 +610,14 @@ button, input, select {
 }
 
 .creator-shell {
-    padding: 16px;
+    padding: 18px;
     display: grid;
-    gap: 12px;
-    max-width: 920px;
+    gap: 14px;
+    max-width: 1040px;
     margin: 0 auto;
 }
 
-.creator-header h2,
-.creator-step h3 {
+.creator-header h2 {
     margin: 0;
     font-family: "Space Grotesk", "Manrope", sans-serif;
 }
@@ -628,19 +627,66 @@ button, input, select {
     color: var(--muted);
 }
 
-.creator-fields {
+.creator-stepper {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 8px;
+}
+
+.creator-step-pill {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    display: grid;
+    gap: 2px;
+    text-align: left;
+    padding: 8px 10px;
+}
+
+.creator-step-pill span {
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+
+.creator-step-pill strong {
+    font-size: 0.88rem;
+    line-height: 1.2;
+}
+
+.creator-step-pill.is-active {
+    border-color: var(--accent-a);
+    background: rgba(73, 215, 217, 0.15);
+}
+
+.creator-step {
+    display: grid;
     gap: 10px;
 }
 
+.creator-step h3 {
+    margin: 0;
+    font-family: "Space Grotesk", "Manrope", sans-serif;
+}
+
+.creator-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 11px;
+}
+
 .creator-field {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 8px;
     display: grid;
     gap: 6px;
 }
 
 .creator-field input,
-.creator-field select {
+.creator-field select,
+.creator-field textarea {
     border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, 0.24);
     background: rgba(255, 255, 255, 0.08);
@@ -648,16 +694,37 @@ button, input, select {
     padding: 8px 10px;
 }
 
+.creator-field select[multiple] {
+    min-height: 128px;
+}
+
+.creator-inline-custom {
+    justify-self: start;
+    margin-top: 2px;
+}
+
 .creator-field.toggle {
     display: flex;
     align-items: center;
     gap: 8px;
     color: var(--muted);
+    padding: 10px;
 }
 
 .creator-actions {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
+}
+
+.creator-actions-sticky {
+    position: sticky;
+    bottom: 0;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-sm);
+    background: rgba(15, 24, 36, 0.92);
+    backdrop-filter: blur(8px);
 }
 
 .creator-error {
@@ -665,20 +732,24 @@ button, input, select {
     font-size: 0.8rem;
 }
 
+.creator-warning {
+    color: #ffe3af;
+    font-size: 0.86rem;
+}
+
+.creator-point-buy {
+    color: #bbe9ff;
+    margin: 0;
+    font-size: 0.92rem;
+}
+
 .creator-review {
     display: grid;
-    gap: 10px;
-}
-
-.creator-review-group {
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.03);
     padding: 10px;
-    background: rgba(255, 255, 255, 0.06);
-}
-
-.creator-review-group h4 {
-    margin: 0 0 6px;
 }
 
 .creator-review-row {
@@ -742,47 +813,9 @@ button, input, select {
     gap: 10px;
 }
 
-.homebrew-shell {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 14px;
-    display: grid;
-    gap: 12px;
-}
-
-.homebrew-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-}
-
-.homebrew-header h2 {
-    margin: 0;
-    font-family: "Space Grotesk", "Manrope", sans-serif;
-}
-
-.homebrew-grid {
-    display: grid;
-    gap: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.homebrew-grid label,
-.homebrew-json {
-    display: grid;
-    gap: 6px;
-    color: var(--muted);
-}
-
-.homebrew-grid input,
-.homebrew-grid select,
-.homebrew-json textarea {
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(255, 255, 255, 0.24);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text);
-    padding: 8px 10px;
+.creator-custom-dialog {
+    max-height: 90vh;
+    overflow: auto;
 }
 
 @media (max-width: 1024px) {
