@@ -99,18 +99,37 @@ function parseFieldValue(field: CreatorFieldV3, raw: string, checked: boolean): 
     return raw;
 }
 
+function selectedClassIdsFromSeed(seed: Record<string, unknown>): string[] {
+    const rows = Array.isArray(seed.class_plan) ? seed.class_plan : [];
+    const ids = new Set<string>();
+    for (const raw of rows) {
+        if (!raw || typeof raw !== "object") continue;
+        const row = raw as Record<string, unknown>;
+        const id = String(row.class_id || row.classId || "").trim();
+        if (id) ids.add(id);
+    }
+    return [...ids];
+}
+
 function evaluateVisible(field: CreatorFieldV3, seed: Record<string, unknown>, row?: Record<string, unknown>): boolean {
     if (!field.visibleWhen?.expression?.trim()) return true;
     try {
+        const selectedClassIds = selectedClassIdsFromSeed(seed);
         const compiled = parser.parse(field.visibleWhen.expression);
         return Boolean(compiled.evaluate({
             seed,
             row,
             ...seed,
+            selectedClassIds,
             size: (value: unknown) => {
                 if (Array.isArray(value) || typeof value === "string") return value.length;
                 if (value && typeof value === "object") return Object.keys(value).length;
                 return 0;
+            },
+            includes: (value: unknown, candidate: unknown) => {
+                if (Array.isArray(value)) return value.map(item => String(item)).includes(String(candidate));
+                if (typeof value === "string") return value.includes(String(candidate));
+                return false;
             }
         } as any));
     } catch {
@@ -592,7 +611,7 @@ export function CharacterCreator(props: Props) {
                                     field,
                                     value,
                                     next => setField(field, next),
-                                    key,
+                                    field.id,
                                     error,
                                     id => {
                                         if (field.type === "multiSelect") {

@@ -18,12 +18,6 @@ creator:
           bindTo: name
           required: true
           default: New Adventurer
-        - id: level_total
-          label: Starting Level
-          type: number
-          bindTo: level_total
-          required: true
-          default: 1
         - id: notes
           label: Character Notes
           type: text
@@ -60,6 +54,12 @@ creator:
       preloadContentTypes: [classes]
       searchContentTypes: [classes]
       fields:
+        - id: level_total
+          label: Starting Level
+          type: number
+          bindTo: level_total
+          required: true
+          default: 1
         - id: class_plan
           label: Class Distribution
           type: repeatGroup
@@ -100,6 +100,69 @@ creator:
                 kind: content
                 contentType: classes
                 filterExpression: "has(optionMeta.data.subclass_of) and includes(selectedClassIds, optionMeta.data.subclass_of.key)"
+        - id: warlock_pact_boon
+          label: Warlock Pact Boon
+          type: select
+          bindTo: warlock_pact_boon
+          visibleWhen: { expression: "includes(selectedClassIds, 'srd_warlock')" }
+          options:
+            kind: static
+            values:
+              - { value: pact_of_the_blade, label: Pact of the Blade }
+              - { value: pact_of_the_chain, label: Pact of the Chain }
+              - { value: pact_of_the_tome, label: Pact of the Tome }
+        - id: fighter_fighting_style
+          label: Fighter Fighting Style
+          type: select
+          bindTo: fighter_fighting_style
+          visibleWhen: { expression: "includes(selectedClassIds, 'srd_fighter')" }
+          options:
+            kind: static
+            values:
+              - { value: archery, label: Archery }
+              - { value: defense, label: Defense }
+              - { value: dueling, label: Dueling }
+              - { value: great_weapon_fighting, label: Great Weapon Fighting }
+              - { value: protection, label: Protection }
+              - { value: two_weapon_fighting, label: Two-Weapon Fighting }
+        - id: cleric_divine_domain_focus
+          label: Cleric Domain Focus
+          type: select
+          bindTo: cleric_divine_domain_focus
+          visibleWhen: { expression: "includes(selectedClassIds, 'srd_cleric')" }
+          options:
+            kind: static
+            values:
+              - { value: life, label: Life }
+              - { value: knowledge, label: Knowledge }
+              - { value: light, label: Light }
+              - { value: nature, label: Nature }
+              - { value: tempest, label: Tempest }
+              - { value: trickery, label: Trickery }
+              - { value: war, label: War }
+        - id: rogue_expertise_choices
+          label: Rogue Expertise Choices
+          type: text
+          bindTo: rogue_expertise_choices
+          visibleWhen: { expression: "includes(selectedClassIds, 'srd_rogue')" }
+        - id: class_feature_choices
+          label: Additional Class-Specific Choices
+          type: repeatGroup
+          bindTo: class_feature_choices
+          fields:
+            - id: class_id
+              label: Class
+              type: select
+              options:
+                kind: content
+                contentType: classes
+                filterExpression: "not has(optionMeta.data.subclass_of) and includes(selectedClassIds, option.value)"
+            - id: choice_label
+              label: Choice Category
+              type: text
+            - id: choice_value
+              label: Chosen Option
+              type: text
 
     - id: background
       title: Background and Proficiencies

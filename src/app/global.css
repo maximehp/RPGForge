@@ -613,7 +613,8 @@ button, input, select {
     padding: 18px;
     display: grid;
     gap: 14px;
-    max-width: 1040px;
+    width: 100%;
+    max-width: none;
     margin: 0 auto;
 }
 
@@ -629,7 +630,7 @@ button, input, select {
 
 .creator-stepper {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 8px;
 }
 
@@ -671,8 +672,8 @@ button, input, select {
 
 .creator-fields {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 11px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
 }
 
 .creator-field {

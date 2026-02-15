@@ -156,9 +156,23 @@ async function buildIndex(packId: string): Promise<CreatorCatalogIndexRecord[]> 
     return indexedRows;
 }
 
+function hasStaleIndexRows(packId: string, rows: CreatorCatalogIndexRecord[]): boolean {
+    const expectedPrefix = `/src/packs/builtin/${packId}/`;
+    return rows.some(row => {
+        const filePath = row.filePath || "";
+        if (filePath.includes("/src/packs/v2/builtin/")) return true;
+        if (filePath.startsWith("/src/packs/builtin/") && !filePath.startsWith(expectedPrefix)) return true;
+        return false;
+    });
+}
+
 export async function ensureCreatorCatalogIndex(packId: string): Promise<CreatorCatalogIndexRecord[]> {
     const existing = await loadCreatorCatalogIndex(packId);
-    if (existing.length) return existing;
+    if (existing.length && !hasStaleIndexRows(packId, existing)) return existing;
+    if (existing.length) {
+        await clearCreatorCatalogIndex(packId);
+        await clearCreatorCatalogCache(packId);
+    }
 
     const rebuilt = await buildIndex(packId);
     if (rebuilt.length) {
@@ -175,11 +189,15 @@ async function loadEntriesFromIndex(packId: string, contentType: string): Promis
 
     const entries: Array<Record<string, unknown>> = [];
     for (const filePath of files) {
-        const doc = await loadBuiltinPackContentChunkV2(packId, filePath);
-        const content = (doc as Record<string, unknown>)?.content as Record<string, unknown> | undefined;
-        const rows = content?.[contentType];
-        if (Array.isArray(rows)) {
-            entries.push(...rows.filter(Boolean) as Array<Record<string, unknown>>);
+        try {
+            const doc = await loadBuiltinPackContentChunkV2(packId, filePath);
+            const content = (doc as Record<string, unknown>)?.content as Record<string, unknown> | undefined;
+            const rows = content?.[contentType];
+            if (Array.isArray(rows)) {
+                entries.push(...rows.filter(Boolean) as Array<Record<string, unknown>>);
+            }
+        } catch {
+            // Ignore stale/missing file paths and continue loading remaining chunks.
         }
     }
     return entries;
