@@ -186,7 +186,7 @@ function mapKindToType(kind: string): string {
 
 async function writePackContent(doc: DocKey, grouped: Record<string, any[]>): Promise<void> {
     const packId = packIdFor(doc);
-    const baseDir = path.join(ROOT, "src", "packs", "v2", "builtin", packId);
+    const baseDir = path.join(ROOT, "src", "packs", "builtin", packId);
     const contentDir = path.join(baseDir, "content");
     const rulesDir = path.join(baseDir, "rules");
 

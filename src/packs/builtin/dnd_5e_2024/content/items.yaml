@@ -1,8 +1,0 @@
-items:
-  - id: longsword
-    label: Longsword
-    type: weapon
-    slot: main_hand
-    weight: 3
-    cost: { gp: 15 }
-    damage: { dice: "1d8", type: slashing }
