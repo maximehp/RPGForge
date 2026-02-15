@@ -3,12 +3,12 @@ import { parsePackManifestV2, parsePackModuleV2 } from "./schema";
 import type { LoadedPackV2, PackManifestV2, PackModuleV2 } from "./types";
 
 const ALL_PACK_FILE_LOADERS: Record<string, () => Promise<string>> = import.meta.glob(
-    "/src/packs/v2/builtin/**/*.{yaml,yml,json}",
+    "/src/packs/builtin/**/*.{yaml,yml,json}",
     { query: "?raw", import: "default" }
 ) as Record<string, () => Promise<string>>;
 
 const BUILTIN_MANIFEST_LOADERS: Record<string, () => Promise<string>> = import.meta.glob(
-    "/src/packs/v2/builtin/**/manifest.{yaml,yml,json}",
+    "/src/packs/builtin/**/manifest.{yaml,yml,json}",
     { query: "?raw", import: "default" }
 ) as Record<string, () => Promise<string>>;
 

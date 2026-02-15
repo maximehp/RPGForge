@@ -125,7 +125,7 @@ async function buildIndex(packId: string): Promise<CreatorCatalogIndexRecord[]> 
             const contentType = String(entry.contentType || "").trim();
             const filePathRaw = String(entry.file || entry.filePath || "").trim();
             if (!contentType || !filePathRaw) continue;
-            const filePath = filePathRaw.startsWith("/") ? filePathRaw : `/src/packs/v2/builtin/${packId}/${filePathRaw}`;
+            const filePath = filePathRaw.startsWith("/") ? filePathRaw : `/src/packs/builtin/${packId}/${filePathRaw}`;
             indexedRows.push({
                 id: `${packId}:${contentType}:${filePath}`,
                 packId,
