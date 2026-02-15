@@ -223,6 +223,22 @@ async function writePackContent(doc: DocKey, grouped: Record<string, any[]>): Pr
         await fs.writeFile(file, YAML.stringify({ content: { [contentType]: rows } }), "utf8");
     }
 
+    const indexRecords = Object.keys(byContentType).map(contentType => ({
+        contentType,
+        file: `content/open5e_${contentType}.yaml`,
+        fields: ["id", "title", "data.name", "data.key"]
+    }));
+    await fs.writeFile(
+        path.join(contentDir, "index.generated.yaml"),
+        YAML.stringify({
+            contentIndex: {
+                schemaVersion: "1.0.0",
+                records: indexRecords
+            }
+        }),
+        "utf8"
+    );
+
     const uniqEffects = effects.filter((effect, index) => {
         const key = `${effect.id}:${JSON.stringify(effect.modifiers || [])}`;
         return effects.findIndex(e => `${e.id}:${JSON.stringify(e.modifiers || [])}` === key) === index;

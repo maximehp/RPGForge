@@ -170,6 +170,16 @@ function ensureStringArray(value: unknown): string[] {
     return value.map(v => String(v)).filter(Boolean);
 }
 
+function uniqueStrings(values: string[]): string[] {
+    return [...new Set(values.filter(Boolean))];
+}
+
+function contentEntryFor(ruleset: ResolvedRuleset, contentType: string, id: string): Record<string, unknown> | null {
+    const row = ruleset.content[contentType]?.[id];
+    if (!row) return null;
+    return row as unknown as Record<string, unknown>;
+}
+
 function getSeedStat(seed: Record<string, unknown>, key: string): number | undefined {
     const stats = (seed.stats as Record<string, unknown>) || {};
     const nested = Number(stats[key]);
@@ -407,35 +417,55 @@ export async function createCharacter(rulesetId: string, ruleset: ResolvedRulese
 
     const classes = Array.isArray(seedObj.class_plan) ? seedObj.class_plan : [];
     if (classes.length) {
-        doc.collections.classes = classes.map((row, idx) => {
+        const classRows = classes.map((row, idx) => {
             const entry = (row || {}) as Record<string, unknown>;
             const classId = String(entry.class_id || entry.classId || `class_${idx + 1}`);
+            const levels = Math.max(1, Math.floor(ensureNumber(entry.levels, 1)));
+            const classEntry = contentEntryFor(ruleset, "classes", classId);
             return {
                 id: classId,
                 classId,
-                levels: Math.max(1, Math.floor(ensureNumber(entry.levels, 1)))
+                levels,
+                title: String(classEntry?.title || classId),
+                data: classEntry?.data || {}
             };
         });
+        const classLevelTotal = classRows.reduce((sum, row) => sum + Number(row.levels || 0), 0);
+        if (classLevelTotal !== totalLevel) {
+            throw new Error(`Class levels (${classLevelTotal}) must equal target level (${totalLevel}).`);
+        }
+        doc.collections.classes = classRows;
     }
 
     const subclassPlan = Array.isArray(seedObj.subclass_plan) ? seedObj.subclass_plan : [];
-    const chosenFeats = ensureStringArray(seedObj.selected_feats);
+    const chosenFeats = uniqueStrings(ensureStringArray(seedObj.selected_feats));
     const features: unknown[] = [...(doc.collections.features || [])];
     for (const featId of chosenFeats) {
-        features.push({ id: featId, type: "feat", source: "creator" });
+        const feat = contentEntryFor(ruleset, "feats", featId);
+        features.push({
+            id: featId,
+            type: "feat",
+            title: String(feat?.title || featId),
+            data: feat?.data || {},
+            source: "creator"
+        });
     }
     for (const row of subclassPlan) {
         const entry = (row || {}) as Record<string, unknown>;
         const classId = String(entry.class_id || "");
-        const subclassName = String(entry.subclass_name || "");
+        const subclassId = String(entry.subclass_id || entry.subclass_name || "");
         const atLevel = Math.max(1, Math.floor(ensureNumber(entry.at_level, 3)));
-        if (classId || subclassName) {
+        if (classId || subclassId) {
+            const subclass = contentEntryFor(ruleset, "classes", subclassId);
             features.push({
-                id: `${classId || "class"}:${subclassName || "subclass"}:${atLevel}`,
+                id: subclassId || `${classId || "class"}:subclass`,
                 type: "subclass",
                 classId,
-                subclass: subclassName,
-                atLevel
+                subclass: subclassId,
+                title: String(subclass?.title || subclassId || "Subclass"),
+                data: subclass?.data || {},
+                atLevel,
+                source: "creator"
             });
         }
     }
@@ -443,28 +473,38 @@ export async function createCharacter(rulesetId: string, ruleset: ResolvedRulese
         doc.collections.features = features;
     }
 
-    const spellIds = [
+    const spellIds = uniqueStrings([
         ...ensureStringArray(seedObj.cantrip_ids),
         ...ensureStringArray(seedObj.spell_ids),
         ...ensureStringArray(seedObj.spellbook_ids)
-    ];
+    ]);
     if (spellIds.length) {
-        const seen = new Set<string>();
-        doc.collections.spells = spellIds
-            .filter(id => {
-                if (seen.has(id)) return false;
-                seen.add(id);
-                return true;
-            })
-            .map(id => ({ id, source: "creator" }));
+        doc.collections.spells = spellIds.map(id => {
+            const spell = contentEntryFor(ruleset, "spells", id);
+            return {
+                id,
+                title: String(spell?.title || id),
+                data: spell?.data || {},
+                source: "creator"
+            };
+        });
     }
 
-    const startItems = ensureStringArray(seedObj.starting_items);
+    const startItems = uniqueStrings(ensureStringArray(seedObj.starting_items));
     if (startItems.length) {
         const existing = Array.isArray(doc.collections.inventory) ? doc.collections.inventory : [];
         doc.collections.inventory = [
             ...existing,
-            ...startItems.map(id => ({ id, title: id, equipped: false, source: "creator" }))
+            ...startItems.map(id => {
+                const item = contentEntryFor(ruleset, "items", id);
+                return {
+                    id,
+                    title: String(item?.title || id),
+                    data: item?.data || {},
+                    equipped: false,
+                    source: "creator"
+                };
+            })
         ];
     }
 
@@ -472,7 +512,6 @@ export async function createCharacter(rulesetId: string, ruleset: ResolvedRulese
     const backgroundId = String(seedObj.background_id || "").trim();
     if (raceId) doc.core.tags.push(`race:${raceId}`);
     if (backgroundId) doc.core.tags.push(`background:${backgroundId}`);
-    if (seedObj.use_homebrew === true) doc.core.tags.push("creator:homebrew_enabled");
 
     doc.collections.activity_log = [
         ...(Array.isArray(doc.collections.activity_log) ? doc.collections.activity_log : []),
