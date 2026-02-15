@@ -2,8 +2,8 @@
 
 ## 1) Start from Template
 Copy one of:
-- `src/packs/v2/builtin/sandbox_rpg/`
-- `src/packs/v2/builtin/dnd_srd_5e_2024/`
+- `src/packs/builtin/sandbox_rpg/`
+- `src/packs/builtin/dnd_srd_5e_2024/`
 
 ## 2) Configure Manifest
 Set:

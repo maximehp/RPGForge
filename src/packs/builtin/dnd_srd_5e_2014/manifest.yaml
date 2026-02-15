@@ -10,9 +10,6 @@ entrypoints:
   model: schema/model.yaml
   rules: rules/rules.yaml
   content:
-    - content/items.yaml
-    - content/spells.yaml
-    - content/features.yaml
     - content/open5e_spells.yaml
     - content/open5e_classes.yaml
     - content/open5e_feats.yaml

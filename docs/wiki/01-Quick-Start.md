@@ -28,5 +28,5 @@ Use `Import .gpack` in the top bar.
 pnpm run sync:open5e
 ```
 Artifacts update under:
-- `src/packs/v2/builtin/dnd_srd_5e_2014/`
-- `src/packs/v2/builtin/dnd_srd_5e_2024/`
+- `src/packs/builtin/dnd_srd_5e_2014/`
+- `src/packs/builtin/dnd_srd_5e_2024/`

@@ -5,7 +5,7 @@
 - `src/runtime/v2/`: character runtime, action dispatch, migration.
 - `src/app/v2/`: V2 app shell, Dockview workspace, panel renderer, creator UI.
 - `src/services/`: runtime API and Dexie persistence.
-- `src/packs/v2/builtin/`: built-in packs.
+- `src/packs/builtin/`: built-in packs.
 
 ## Runtime Contracts
 - `ResolvedRuleset`
