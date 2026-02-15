@@ -1,20 +1,16 @@
 creator:
   schemaVersion: "3.0.0"
   title: D&D SRD 2014 Character Creator
-  description: Full pack-driven 2014 character creation with multiclass, spells, feats, and homebrew.
+  description: Roll20-style guided flow with strict validation and in-flow custom options.
   rules:
     - id: level-range
       severity: error
       when: "level_total < 1 or level_total > 20"
       message: "Total character level must be between 1 and 20."
-    - id: no-class-selected
-      severity: error
-      when: "size(class_plan) < 1"
-      message: "Select at least one class in the level plan."
   steps:
     - id: identity
       title: Identity
-      description: Name your character and choose campaign toggles.
+      description: Name your character and define campaign setup toggles.
       fields:
         - id: name
           label: Character Name
@@ -23,109 +19,22 @@ creator:
           required: true
           default: New Adventurer
         - id: level_total
-          label: Total Level
+          label: Starting Level
           type: number
           bindTo: level_total
           required: true
           default: 1
-        - id: campaign_notes
-          label: Campaign Notes
+        - id: notes
+          label: Character Notes
           type: text
           bindTo: notes
-        - id: use_homebrew
-          label: Enable Homebrew During Creation
+        - id: allow_multiclass
+          label: Multiclass Enabled (Campaign Rule)
           type: toggle
-          bindTo: use_homebrew
+          bindTo: allow_multiclass
           default: true
-    - id: level_plan
-      title: Level Plan (Multiclass)
-      description: Define class levels totaling your target level.
-      preloadContentTypes: [classes]
-      searchContentTypes: [classes]
-      fields:
-        - id: class_plan
-          label: Class Distribution
-          type: repeatGroup
-          bindTo: class_plan
-          required: true
-          fields:
-            - id: class_id
-              label: Class
-              type: select
-              options:
-                kind: content
-                contentType: classes
-              required: true
-            - id: levels
-              label: Levels in Class
-              type: number
-              required: true
-    - id: ability_scores
-      title: Ability Scores
-      description: Roll-first flow with alternate methods.
-      fields:
-        - id: ability_method
-          label: Ability Score Method
-          type: select
-          bindTo: ability_method
-          required: true
-          default: roll
-          options:
-            kind: static
-            values:
-              - { value: roll, label: Roll First (Assign Later) }
-              - { value: point_buy, label: Point Buy }
-              - { value: standard_array, label: Standard Array }
-              - { value: manual, label: Manual Entry }
-        - id: score_rolls
-          label: Rolled Scores
-          type: roller
-          bindTo: score_rolls
-          roller:
-            expression: "4d6"
-            count: 6
-            dropLowest: 1
-            reroll:
-              equals: 1
-              maxRerolls: 6
-            assignment: manual
-        - id: str
-          label: Strength
-          type: number
-          bindTo: stats.str
-          required: true
-          default: 10
-        - id: dex
-          label: Dexterity
-          type: number
-          bindTo: stats.dex
-          required: true
-          default: 10
-        - id: con
-          label: Constitution
-          type: number
-          bindTo: stats.con
-          required: true
-          default: 10
-        - id: int
-          label: Intelligence
-          type: number
-          bindTo: stats.int
-          required: true
-          default: 10
-        - id: wis
-          label: Wisdom
-          type: number
-          bindTo: stats.wis
-          required: true
-          default: 10
-        - id: cha
-          label: Charisma
-          type: number
-          bindTo: stats.cha
-          required: true
-          default: 10
-    - id: race
+
+    - id: ancestry
       title: Race and Subrace
       preloadContentTypes: [races]
       searchContentTypes: [races]
@@ -138,12 +47,62 @@ creator:
           options:
             kind: content
             contentType: races
-        - id: subrace
-          label: Subrace (if available)
-          type: text
-          bindTo: subrace
+        - id: subrace_id
+          label: Subrace
+          type: select
+          bindTo: subrace_id
+          options:
+            kind: expression
+            expression: "selectedRaceSubraces"
+
+    - id: class_plan
+      title: Class Plan and Subclasses
+      preloadContentTypes: [classes]
+      searchContentTypes: [classes]
+      fields:
+        - id: class_plan
+          label: Class Distribution
+          type: repeatGroup
+          bindTo: class_plan
+          required: true
+          fields:
+            - id: class_id
+              label: Class
+              type: select
+              required: true
+              options:
+                kind: content
+                contentType: classes
+                filterExpression: "not has(optionMeta.data.subclass_of)"
+            - id: levels
+              label: Levels in Class
+              type: number
+              required: true
+              default: 1
+        - id: subclass_plan
+          label: Subclass Selections
+          type: repeatGroup
+          bindTo: subclass_plan
+          fields:
+            - id: class_id
+              label: Class
+              type: select
+              required: true
+              options:
+                kind: content
+                contentType: classes
+                filterExpression: "not has(optionMeta.data.subclass_of) and includes(selectedClassIds, option.value)"
+            - id: subclass_id
+              label: Subclass
+              type: select
+              required: true
+              options:
+                kind: content
+                contentType: classes
+                filterExpression: "has(optionMeta.data.subclass_of) and includes(selectedClassIds, optionMeta.data.subclass_of.key)"
+
     - id: background
-      title: Background, Skills, Tools, Languages
+      title: Background and Proficiencies
       preloadContentTypes: [backgrounds]
       searchContentTypes: [backgrounds]
       fields:
@@ -188,61 +147,111 @@ creator:
           label: Languages
           type: text
           bindTo: language_choices
-    - id: class_features
-      title: Classes, Subclasses, and Level Features
-      preloadContentTypes: [classes, features]
-      searchContentTypes: [classes, features]
+
+    - id: ability_scores
+      title: Ability Scores
+      description: Supports roll, point buy, standard array, and manual entry.
       fields:
-        - id: subclass_plan
-          label: Subclass Selection Plan
-          type: repeatGroup
-          bindTo: subclass_plan
-          fields:
-            - id: class_id
-              label: Class
-              type: select
-              options:
-                kind: content
-                contentType: classes
-            - id: subclass_name
-              label: Subclass
-              type: text
-            - id: at_level
-              label: Pick at Level
-              type: number
-              default: 3
-        - id: class_feature_overrides
-          label: Optional Class Feature Choices
-          type: text
-          bindTo: class_feature_overrides
+        - id: ability_method
+          label: Ability Score Method
+          type: select
+          bindTo: ability_method
+          required: true
+          default: roll
+          options:
+            kind: static
+            values:
+              - { value: roll, label: Roll (4d6 drop lowest) }
+              - { value: point_buy, label: Point Buy (27 points) }
+              - { value: standard_array, label: Standard Array }
+              - { value: manual, label: Manual Entry }
+        - id: score_rolls
+          label: Rolled Scores
+          type: roller
+          bindTo: score_rolls
+          visibleWhen: { expression: "ability_method == 'roll'" }
+          roller:
+            expression: "4d6"
+            count: 6
+            dropLowest: 1
+            reroll:
+              equals: 1
+              maxRerolls: 6
+            assignment: manual
+        - id: str
+          label: Strength
+          type: number
+          bindTo: stats.str
+          required: true
+          default: 10
+        - id: dex
+          label: Dexterity
+          type: number
+          bindTo: stats.dex
+          required: true
+          default: 10
+        - id: con
+          label: Constitution
+          type: number
+          bindTo: stats.con
+          required: true
+          default: 10
+        - id: int
+          label: Intelligence
+          type: number
+          bindTo: stats.int
+          required: true
+          default: 10
+        - id: wis
+          label: Wisdom
+          type: number
+          bindTo: stats.wis
+          required: true
+          default: 10
+        - id: cha
+          label: Charisma
+          type: number
+          bindTo: stats.cha
+          required: true
+          default: 10
+
     - id: feats_asi
       title: Feats and ASI
       preloadContentTypes: [feats]
       searchContentTypes: [feats]
       fields:
-        - id: asi_strategy
-          label: ASI/Feat Strategy
-          type: select
-          bindTo: asi_strategy
-          default: mixed
-          options:
-            kind: static
-            values:
-              - { value: asi_only, label: Ability Score Improvements Only }
-              - { value: feats_only, label: Feats Whenever Eligible }
-              - { value: mixed, label: Mixed Choice by Level }
-        - id: selected_feats
-          label: Selected Feats
-          type: multiSelect
-          bindTo: selected_feats
-          options:
-            kind: content
-            contentType: feats
+        - id: asi_choices
+          label: ASI / Feat Choices
+          type: repeatGroup
+          bindTo: asi_choices
+          fields:
+            - id: choice_type
+              label: Choice Type
+              type: select
+              required: true
+              default: feat
+              options:
+                kind: static
+                values:
+                  - { value: feat, label: Feat }
+                  - { value: asi, label: Ability Score Improvement }
+            - id: feat_id
+              label: Feat
+              type: select
+              visibleWhen: { expression: "row.choice_type == 'feat'" }
+              options:
+                kind: content
+                contentType: feats
+            - id: asi_stat
+              label: ASI Details
+              type: text
+              visibleWhen: { expression: "row.choice_type == 'asi'" }
+
     - id: spells
-      title: Spellcasting Setup
-      description: Configure cantrips, spells known/prepared, and multiclass spell legality.
+      title: Spellcasting
+      description: Select cantrips, known/prepared spells, and spellbook entries.
       preloadContentTypes: [spells, classes]
-      searchContentTypes: [spells, classes]
+      searchContentTypes: [spells]
       fields:
         - id: cantrip_ids
           label: Cantrips
@@ -251,6 +260,7 @@ creator:
           options:
             kind: content
             contentType: spells
+            filterExpression: "optionMeta.data.level == 0 and intersects(optionClassKeys, selectedClassIds)"
         - id: spell_ids
           label: Spells Known / Prepared
           type: multiSelect
@@ -258,50 +268,39 @@ creator:
           options:
             kind: content
             contentType: spells
+            filterExpression: "optionMeta.data.level > 0 and optionMeta.data.level <= spellLevelCap and intersects(optionClassKeys, selectedClassIds)"
         - id: spellbook_ids
-          label: Spellbook (if applicable)
+          label: Spellbook Entries
           type: multiSelect
           bindTo: spellbook_ids
           options:
             kind: content
             contentType: spells
-      rules:
-        - id: missing-spells-warning
-          severity: warning
-          when: "level_total >= 1 and size(spell_ids) == 0"
-          message: "No spells selected. Proceed only if this build should be non-caster."
-          overridePolicy:
-            id: missing-spells-warning
-            title: "No spells selected"
-            message: "This character has no selected spells. Continue anyway?"
-            confirmLabel: "Proceed anyway"
-            cancelLabel: "Cancel"
+            filterExpression: "optionMeta.data.level > 0 and optionMeta.data.level <= spellLevelCap and intersects(optionClassKeys, selectedClassIds)"
+
     - id: equipment
-      title: Starting Equipment
+      title: Equipment
       preloadContentTypes: [items]
       searchContentTypes: [items]
       fields:
-        - id: equipment_mode
-          label: Equipment Mode
-          type: select
-          bindTo: equipment_mode
-          default: package
+        - id: equipment_package_ids
+          label: Recommended Equipment Packages
+          type: multiSelect
+          bindTo: equipment_package_ids
           options:
-            kind: static
-            values:
-              - { value: package, label: Class/Background Packages }
-              - { value: gold_buy, label: Gold Buy }
-              - { value: custom, label: Custom Loadout }
+            kind: expression
+            expression: "recommendedEquipmentOptions"
         - id: starting_items
-          label: Starting Items
+          label: Additional Starting Items
           type: multiSelect
           bindTo: starting_items
           options:
             kind: content
             contentType: items
+
     - id: review
       title: Review and Confirm
-      description: Validate final choices and confirm warnings before creating the character.
+      description: Review your selections and confirm creation.
       fields:
         - id: review_ack
           label: I have reviewed this build
