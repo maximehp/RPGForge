@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import YAML from "yaml";
 import { nanoid } from "nanoid";
+import { Parser } from "expr-eval";
 import { importPackBundle as importPackBundleFile } from "../engine/v2/importer";
 import { listBuiltinPackManifestsV2, loadBuiltinPackModulePartV2 } from "../engine/v2/builtinLoader";
 import { activateRuleset } from "../engine/v2/resolver";
@@ -47,6 +48,14 @@ import { loadLayoutState } from "./v2LayoutService";
 import { migrateCharacter as migrateCharacterDoc, migratePack as migratePackManifest } from "../runtime/v2/migrations";
 import { compileCanonicalToPackArtifacts as compileCanonicalArtifacts, syncOpen5eSrd as syncOpen5eSrdEngine } from "../engine/v2/open5eImporter";
 import { evaluateCreatorRules } from "../runtime/v2/creatorRules";
+import {
+    evaluateSrd2014CreatorIssues,
+    normalizeSrd2014CreatorSeed,
+    recommendedEquipmentOptions,
+    selectedClassIds,
+    selectedSubraceOptions,
+    spellLevelCap
+} from "../runtime/v2/creatorSrd2014";
 import { invalidateCreatorCatalog, queryCreatorCatalog, warmCreatorCatalog } from "./v2CatalogService";
 
 const PACK_ID_ALIASES: Record<string, string> = {
@@ -55,6 +64,9 @@ const PACK_ID_ALIASES: Record<string, string> = {
     "srd_2024": "dnd_srd_5e_2024",
     "srd_2014": "dnd_srd_5e_2014"
 };
+
+const LOCAL_PROFILE_STORAGE_KEY = "rpgforge:local-profile-id";
+const expressionParser = new Parser();
 
 export type CharacterListQuery = CharacterListQueryDb;
 
@@ -88,6 +100,31 @@ export type CreatorStepHydration = {
 
 export function resolvePackAlias(id: string): string {
     return PACK_ID_ALIASES[id] || id;
+}
+
+function hashText(input: string): string {
+    let hash = 5381;
+    for (let i = 0; i < input.length; i += 1) {
+        hash = ((hash << 5) + hash) ^ input.charCodeAt(i);
+    }
+    return `h${Math.abs(hash >>> 0).toString(16)}`;
+}
+
+function creatorRevisionForRuleset(ruleset: ResolvedRuleset): string {
+    return hashText(JSON.stringify(ruleset.creator || {}));
+}
+
+function localProfileId(): string {
+    if (typeof localStorage === "undefined") return "local";
+    try {
+        const existing = localStorage.getItem(LOCAL_PROFILE_STORAGE_KEY);
+        if (existing) return existing;
+        const next = nanoid(12);
+        localStorage.setItem(LOCAL_PROFILE_STORAGE_KEY, next);
+        return next;
+    } catch {
+        return "local";
+    }
 }
 
 function uniqueByVersion(packs: LoadedPackV2[]): LoadedPackV2[] {
@@ -192,6 +229,28 @@ function isCreatorV3(creator: unknown): creator is { schemaVersion: "3.0.0"; ste
 
 function extractPackIdFromRulesetId(rulesetId: string): string {
     return rulesetId.split("@")[0] || rulesetId;
+}
+
+function isSrd2014Ruleset(ruleset: ResolvedRuleset): boolean {
+    return extractPackIdFromRulesetId(ruleset.id) === "dnd_srd_5e_2014";
+}
+
+function safeSlug(input: string): string {
+    return input
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .slice(0, 64);
+}
+
+function toOptionClassKeys(optionMeta?: Record<string, unknown>): string[] {
+    const data = (optionMeta?.data || {}) as Record<string, unknown>;
+    const classes = Array.isArray(data.classes) ? data.classes : [];
+    return classes
+        .map(raw => (raw && typeof raw === "object" ? raw as Record<string, unknown> : {}))
+        .map(row => String(row.key || ""))
+        .filter(Boolean);
 }
 
 export async function listAvailablePackIds(): Promise<string[]> {
@@ -476,6 +535,102 @@ export async function exportOverlayPack(overlayPackId: string): Promise<Blob> {
     return await zip.generateAsync({ type: "blob" });
 }
 
+async function ensureRulesetHomebrewOverlay(ruleset: ResolvedRuleset): Promise<OverlayPackDocumentV2> {
+    const rootPackId = extractPackIdFromRulesetId(ruleset.id);
+    const profileId = safeSlug(localProfileId()) || "local";
+    const overlayId = `overlay_homebrew:${profileId}:${rootPackId}`;
+    const manifestId = `homebrew:${profileId}:${rootPackId}`;
+
+    const existing = await getOverlay(overlayId);
+    if (existing) return existing;
+
+    const now = new Date().toISOString();
+    const overlay: OverlayPackDocumentV2 = {
+        meta: {
+            id: overlayId,
+            rulesetId: ruleset.id,
+            scope: "global",
+            name: `Homebrew ${rootPackId}`,
+            createdAt: now,
+            updatedAt: now
+        },
+        manifest: {
+            schemaVersion: "2.0.0",
+            id: manifestId,
+            name: `Homebrew ${rootPackId}`,
+            version: "0.1.0",
+            kind: "addon",
+            description: "User local homebrew content for creator custom options.",
+            dependsOn: [{ id: rootPackId, range: "*" }],
+            entrypoints: {
+                content: ["content/homebrew.yaml"],
+                effects: "rules/effects.yaml",
+                authoring: "ui/authoring.yaml"
+            }
+        },
+        module: {
+            content: {},
+            effects: [],
+            authoring: {
+                enabled: true,
+                templates: []
+            }
+        }
+    };
+
+    await persistOverlay(overlay);
+    await persistPack({
+        manifest: overlay.manifest,
+        module: overlay.module,
+        source: "overlay",
+        sourceRef: overlay.meta.id
+    });
+    return overlay;
+}
+
+export async function upsertCreatorCustomOption(
+    sessionId: string,
+    input: {
+        contentType: string;
+        name: string;
+        slug?: string;
+        description?: string;
+        data?: Record<string, unknown>;
+    }
+): Promise<{ id: string; label: string; contentType: string; overlayPackId: string }> {
+    const session = await getCreatorSession(sessionId);
+    if (!session) throw new Error(`Creator session not found: ${sessionId}`);
+    const ruleset = await resolveCreatorRuleset(session);
+    const contentType = String(input.contentType || "").trim();
+    if (!contentType) throw new Error("Custom option requires contentType.");
+
+    const name = String(input.name || "").trim();
+    if (!name) throw new Error("Custom option requires name.");
+
+    const slugSeed = safeSlug(input.slug || name) || `custom_${Date.now()}`;
+    const id = slugSeed.startsWith("custom_") ? slugSeed : `custom_${slugSeed}`;
+    const overlay = await ensureRulesetHomebrewOverlay(ruleset);
+
+    await upsertOverlayEntity(overlay.meta.id, {
+        contentType,
+        id,
+        title: name,
+        data: {
+            name,
+            description: String(input.description || "").trim(),
+            ...(input.data || {})
+        }
+    });
+
+    await invalidateCreatorCatalog(extractPackIdFromRulesetId(ruleset.id));
+    return {
+        id,
+        label: name,
+        contentType,
+        overlayPackId: overlay.meta.id
+    };
+}
+
 export async function startCharacterCreator(
     rulesetId: string,
     options?: { resume?: boolean }
@@ -483,9 +638,12 @@ export async function startCharacterCreator(
     const ruleset = await getRuleset(rulesetId);
     if (!ruleset) throw new Error(`Ruleset not found: ${rulesetId}`);
 
+    const revision = creatorRevisionForRuleset(ruleset);
     if (options?.resume) {
         const existing = await getLatestCreatorSessionForRuleset(rulesetId);
-        if (existing) return existing;
+        if (existing && existing.creatorRevision === revision) {
+            return existing;
+        }
     }
 
     const now = new Date().toISOString();
@@ -494,8 +652,13 @@ export async function startCharacterCreator(
         rulesetId,
         createdAt: now,
         updatedAt: now,
+        creatorRevision: revision,
         seed: {},
         steps: ruleset.creator?.steps || [],
+        uiState: {
+            currentStepId: isCreatorV3(ruleset.creator) ? String(ruleset.creator.steps[0]?.id || "") : "",
+            currentStepIndex: 0
+        },
         stepSnapshots: {},
         validation: { errors: [], warnings: [] },
         warningConfirmations: [],
@@ -522,6 +685,22 @@ export async function upsertCreatorSessionProgress(sessionId: string, seedPatch:
     if (!session) throw new Error(`Creator session not found: ${sessionId}`);
 
     session.seed = { ...session.seed, ...seedPatch };
+    session.updatedAt = new Date().toISOString();
+    await persistCreatorSession(session);
+    return session;
+}
+
+export async function upsertCreatorSessionUiState(
+    sessionId: string,
+    uiStatePatch: { currentStepId?: string; currentStepIndex?: number }
+): Promise<CreatorSessionV2> {
+    const session = await getCreatorSession(sessionId);
+    if (!session) throw new Error(`Creator session not found: ${sessionId}`);
+
+    session.uiState = {
+        ...(session.uiState || {}),
+        ...uiStatePatch
+    };
     session.updatedAt = new Date().toISOString();
     await persistCreatorSession(session);
     return session;
@@ -572,24 +751,109 @@ async function hydrateFieldOptions(
     packId: string,
     field: CreatorFieldV3,
     ruleset: ResolvedRuleset,
+    session: CreatorSessionV2,
+    derivedContext: Record<string, unknown>,
     query?: { search?: string; limit?: number; offset?: number }
 ): Promise<Array<{ value: string; label: string; meta?: Record<string, unknown> }>> {
     if (!field.options) return [];
+    const evaluateFilter = (rows: Array<{ value: string; label: string; meta?: Record<string, unknown> }>) => {
+        const expression = field.options?.filterExpression?.trim();
+        if (!expression) return rows;
+
+        let compiled: ReturnType<typeof expressionParser.parse> | null = null;
+        try {
+            compiled = expressionParser.parse(expression);
+        } catch {
+            return rows;
+        }
+        return rows.filter(option => {
+            const optionMeta = (option.meta || {}) as Record<string, unknown>;
+            const optionClassKeys = toOptionClassKeys(optionMeta);
+            try {
+                return Boolean(compiled?.evaluate({
+                    seed: session.seed,
+                    ...session.seed,
+                    ...derivedContext,
+                    option,
+                    optionMeta,
+                    optionClassKeys,
+                    size: (value: unknown) => {
+                        if (Array.isArray(value) || typeof value === "string") return value.length;
+                        if (value && typeof value === "object") return Object.keys(value).length;
+                        return 0;
+                    },
+                    has: (value: unknown) => {
+                        if (value == null) return false;
+                        if (Array.isArray(value) || typeof value === "string") return value.length > 0;
+                        if (typeof value === "object") return Object.keys(value).length > 0;
+                        return true;
+                    },
+                    includes: (value: unknown, candidate: unknown) => {
+                        if (Array.isArray(value)) return value.map(item => String(item)).includes(String(candidate));
+                        if (typeof value === "string") return value.includes(String(candidate));
+                        return false;
+                    },
+                    intersects: (left: unknown, right: unknown) => {
+                        if (!Array.isArray(left) || !Array.isArray(right)) return false;
+                        const rightSet = new Set(right.map(item => String(item)));
+                        return left.some(item => rightSet.has(String(item)));
+                    }
+                } as any));
+            } catch {
+                return true;
+            }
+        });
+    };
+
     if (field.options.kind === "static") {
-        return field.options.values || [];
+        return evaluateFilter(field.options.values || []);
     }
     if (field.options.kind === "content" && field.options.contentType) {
-        return await queryCreatorCatalog(packId, field.options.contentType, {
+        const rows = await queryCreatorCatalog(packId, field.options.contentType, {
             search: query?.search,
             limit: query?.limit ?? 100,
             offset: query?.offset ?? 0
         });
+        return evaluateFilter(rows);
     }
     if (field.options.kind === "lookup" && field.options.lookupTable) {
         const table = ruleset.rules.lookups[field.options.lookupTable] || {};
         const pairs = Object.entries(table);
         pairs.sort((a, b) => Number(a[0]) - Number(b[0]));
-        return pairs.map(([value]) => ({ value, label: value }));
+        return evaluateFilter(pairs.map(([value]) => ({ value, label: value })));
+    }
+    if (field.options.kind === "expression" && field.options.expression?.trim()) {
+        try {
+            const compiled = expressionParser.parse(field.options.expression);
+            const value = compiled.evaluate({
+                seed: session.seed,
+                ...session.seed,
+                ...derivedContext
+            } as any);
+            if (!Array.isArray(value)) return [];
+            const rows = value
+                .map((raw, index) => {
+                    if (typeof raw === "string") {
+                        return { value: raw, label: raw };
+                    }
+                    if (raw && typeof raw === "object") {
+                        const row = raw as Record<string, unknown>;
+                        const fallback = String(row.value || row.id || `option_${index + 1}`);
+                        return {
+                            value: String(row.value || row.id || fallback),
+                            label: String(row.label || row.title || fallback),
+                            meta: row.meta && typeof row.meta === "object"
+                                ? row.meta as Record<string, unknown>
+                                : undefined
+                        };
+                    }
+                    return null;
+                })
+                .filter((row): row is { value: string; label: string; meta?: Record<string, unknown> } => Boolean(row));
+            return evaluateFilter(rows);
+        } catch {
+            return [];
+        }
     }
     return [];
 }
@@ -612,12 +876,18 @@ export async function hydrateCreatorStep(
     const options: Record<string, Array<{ value: string; label: string; meta?: Record<string, unknown> }>> = {};
     const packId = extractPackIdFromRulesetId(ruleset.id);
     const fields = Array.isArray((step as any).fields) ? (step as any).fields as CreatorFieldV3[] : [];
+    const derivedContext: Record<string, unknown> = {
+        selectedClassIds: selectedClassIds(session.seed),
+        spellLevelCap: spellLevelCap(session.seed),
+        selectedRaceSubraces: selectedSubraceOptions(ruleset, session.seed),
+        recommendedEquipmentOptions: recommendedEquipmentOptions(session.seed)
+    };
     const flattened = flattenCreatorFields(fields);
     for (const item of flattened) {
-        options[item.optionKey] = await hydrateFieldOptions(packId, item.field, ruleset, query);
+        options[item.optionKey] = await hydrateFieldOptions(packId, item.field, ruleset, session, derivedContext, query);
     }
 
-    const issues = evaluateCreatorRules(
+    const genericIssues = evaluateCreatorRules(
         [
             ...(ruleset.creator.rules || []),
             ...((step as any).rules || []),
@@ -625,9 +895,13 @@ export async function hydrateCreatorStep(
         ],
         contextFromSession(session)
     );
+    const packIssues = isSrd2014Ruleset(ruleset)
+        ? evaluateSrd2014CreatorIssues(ruleset, session.seed, stepId)
+        : [];
+    const mergedIssues = [...genericIssues, ...packIssues];
     session.validation = {
-        errors: issues.filter(issue => issue.severity === "error"),
-        warnings: issues.filter(issue => issue.severity === "warning")
+        errors: mergedIssues.filter(issue => issue.severity === "error"),
+        warnings: mergedIssues.filter(issue => issue.severity === "warning")
     };
     session.stepSnapshots = {
         ...(session.stepSnapshots || {}),
@@ -636,10 +910,14 @@ export async function hydrateCreatorStep(
             query: query || {}
         }
     };
+    const stepIndex = ruleset.creator.steps.findIndex(s => (s as any).id === stepId);
+    session.uiState = {
+        ...(session.uiState || {}),
+        currentStepId: stepId,
+        currentStepIndex: stepIndex >= 0 ? stepIndex : (session.uiState?.currentStepIndex || 0)
+    };
     session.updatedAt = new Date().toISOString();
     await persistCreatorSession(session);
-
-    const stepIndex = ruleset.creator.steps.findIndex(s => (s as any).id === stepId);
     const preload = Array.isArray((step as any).preloadContentTypes) ? (step as any).preloadContentTypes as string[] : [];
     const next = stepIndex >= 0 ? ruleset.creator.steps[stepIndex + 1] : undefined;
     const nextStepWarm = next
@@ -658,7 +936,7 @@ export async function hydrateCreatorStep(
     return {
         step,
         options,
-        issues
+        issues: mergedIssues
     };
 }
 
@@ -694,6 +972,9 @@ export async function validateCreatorSession(
         }
     }
     const issues = evaluateCreatorRules(rules, contextFromSession(session));
+    const packIssues = isSrd2014Ruleset(ruleset)
+        ? evaluateSrd2014CreatorIssues(ruleset, session.seed, stepId)
+        : [];
     const errors = issues
         .filter(issue => issue.severity === "error")
         .map(issue => ({ id: issue.id, message: issue.message }));
@@ -701,10 +982,23 @@ export async function validateCreatorSession(
         .filter(issue => issue.severity === "warning")
         .map(issue => ({ id: issue.id, message: issue.message }));
 
-    session.validation = { errors, warnings };
+    const extraErrors = packIssues
+        .filter(issue => issue.severity === "error")
+        .map(issue => ({ id: issue.id, message: issue.message }));
+    const extraWarnings = packIssues
+        .filter(issue => issue.severity === "warning")
+        .map(issue => ({ id: issue.id, message: issue.message }));
+
+    session.validation = {
+        errors: [...errors, ...extraErrors],
+        warnings: [...warnings, ...extraWarnings]
+    };
     session.updatedAt = new Date().toISOString();
     await persistCreatorSession(session);
-    return { errors, warnings };
+    return {
+        errors: [...errors, ...extraErrors],
+        warnings: [...warnings, ...extraWarnings]
+    };
 }
 
 export async function confirmCreatorWarnings(sessionId: string, warningIds: string[]): Promise<CreatorSessionV2> {
@@ -722,7 +1016,12 @@ export async function invalidateCreatorCatalogForRuleset(rulesetId: string): Pro
 }
 
 export async function completeCharacterCreator(sessionId: string, choices: Record<string, unknown>): Promise<CharacterDocumentV2> {
-    const session = await upsertCreatorSessionProgress(sessionId, choices);
+    let session = await upsertCreatorSessionProgress(sessionId, choices);
+    const ruleset = await resolveCreatorRuleset(session);
+    if (isSrd2014Ruleset(ruleset)) {
+        const normalized = normalizeSrd2014CreatorSeed(session.seed);
+        session = await upsertCreatorSessionProgress(sessionId, normalized);
+    }
     const validation = await validateCreatorSession(sessionId);
     if (validation.errors.length) {
         throw new Error(`Creator has blocking validation errors: ${validation.errors.map(e => e.message).join("; ")}`);

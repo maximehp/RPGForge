@@ -5,7 +5,6 @@ import {
     completeCharacterCreator,
     dispatchAction,
     getRecentCharacters,
-    invalidateCreatorCatalogForRuleset,
     importPackBundle,
     listAvailablePackIds,
     loadCharacterForOpen,
@@ -20,9 +19,8 @@ import { DockviewWorkspace } from "./DockviewWorkspace";
 import { CharacterCreator } from "./CharacterCreator";
 import { CharacterBrowser } from "./CharacterBrowser";
 import { RecentCharacters } from "./RecentCharacters";
-import { HomebrewStudio } from "./HomebrewStudio";
 
-type AppView = "home" | "characters" | "creator" | "sheet" | "homebrew";
+type AppView = "home" | "characters" | "creator" | "sheet";
 const LAST_OPEN_CHARACTER_STORAGE_KEY = "rpgforge:last-open-character-id";
 
 function readLastOpenCharacterId(): string {
@@ -405,30 +403,11 @@ export function V2App() {
                         preset={ruleset.creator as CharacterCreatorPresetV3}
                         sessionId={creatorSession.id}
                         initialSeed={creatorSeed}
+                        initialStepId={creatorSession.uiState?.currentStepId}
                         refreshToken={creatorRefreshToken}
                         onSeedChange={onCreatorSeedChange}
                         onComplete={onCompleteCreator}
                         onCancel={() => setView("home")}
-                        onOpenHomebrewStudio={() => setView("homebrew")}
-                    />
-                ) : null}
-
-                {view === "homebrew" && ruleset ? (
-                    <HomebrewStudio
-                        rulesetId={ruleset.id}
-                        characterId={character?.meta.id}
-                        onClose={() => setView("creator")}
-                        onSaved={() => {
-                            void invalidateCreatorCatalogForRuleset(ruleset.id)
-                                .then(() => {
-                                    setCreatorRefreshToken(x => x + 1);
-                                    setStatus("Homebrew saved and creator catalog refreshed.");
-                                })
-                                .catch(err => {
-                                    const msg = err instanceof Error ? err.message : String(err);
-                                    setError(msg);
-                                });
-                        }}
                     />
                 ) : null}
 

@@ -280,6 +280,7 @@ export async function listPersistedPackManifestIds(): Promise<string[]> {
         const at = key.lastIndexOf("@");
         const manifestId = at > 0 ? key.slice(0, at) : key;
         if (manifestId.startsWith("overlay_")) continue;
+        if (manifestId.startsWith("homebrew:")) continue;
         ids.add(manifestId);
     }
     return [...ids].sort((a, b) => a.localeCompare(b));

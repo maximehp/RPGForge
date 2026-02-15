@@ -104,6 +104,7 @@ const CreatorOptionSourceV3Schema = z.object({
     values: z.array(CreatorOptionItemV3Schema).optional(),
     contentType: z.string().optional(),
     query: z.string().optional(),
+    filterExpression: z.string().optional(),
     lookupTable: z.string().optional(),
     expression: z.string().optional(),
     valuePath: z.string().optional(),

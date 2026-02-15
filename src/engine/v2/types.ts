@@ -86,6 +86,7 @@ export type CreatorOptionSourceV3 = {
     values?: CreatorOptionItemV3[];
     contentType?: string;
     query?: string;
+    filterExpression?: string;
     lookupTable?: string;
     expression?: string;
     valuePath?: string;
@@ -386,8 +387,13 @@ export type CreatorSessionV2 = {
     rulesetId: string;
     createdAt: string;
     updatedAt: string;
+    creatorRevision?: string;
     seed: Record<string, unknown>;
     steps: CreatorStepV3[];
+    uiState?: {
+        currentStepId?: string;
+        currentStepIndex?: number;
+    };
     stepSnapshots?: Record<string, Record<string, unknown>>;
     validation?: {
         errors: Array<{ id: string; message: string }>;
