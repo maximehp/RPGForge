@@ -1,65 +1,76 @@
 # RPGForge TODO
 
-## Current Priority (Creator Completeness + Quality)
-- [ ] Ship a complete, pack-driven creator flow for `dnd_srd_5e_2014` with a Roll20-like end-to-end experience.
-- [ ] Remove creator jank in navigation, validation feedback, and state persistence.
-- [ ] Keep creator content loading step-scoped and lazy (no full catalog load up front).
+## Current Priority (Creator Page Redesign)
+- [ ] Redesign SRD 2014 creator pages one-by-one.
+- [ ] Keep the creator fully pack-driven while redesigning.
+- [ ] Remove remaining UI jank (overlap, overflow, unstable inputs, inconsistent spacing).
+- [ ] Keep creator data loading step-scoped and lazy.
 
-## 1) Full Creator Coverage (SRD 2014)
-Required flow coverage:
-- [ ] Identity + campaign toggles.
-- [ ] Level plan with multiclass support.
-- [ ] Ability scores: roll, point buy, standard array, manual.
-- [ ] Race/subrace and related choices.
-- [ ] Background choices (skills/tools/languages where applicable).
-- [ ] Class/subclass progression and level-gated choices.
-- [ ] Feats vs ASI decisions where eligible.
-- [ ] Spell setup (cantrips, known/prepared/spellbook by class behavior).
-- [ ] Equipment/start loadout.
-- [ ] Final review step before create.
+## Creator Pages (Redo One by One)
 
-Acceptance:
-- [ ] A user can create a valid SRD 2014 character at different levels without manual JSON edits.
-- [ ] Created character opens directly into sheet and persists across reload.
+### 1) Class Plan and Subclasses
+- [ ] Redo page layout and hierarchy.
+- [ ] Keep class distribution as the source of total level.
+- [ ] Ensure subclass options populate from selected classes only.
+- [ ] Ensure subclass requirements appear when class levels reach thresholds.
+- [ ] Verify class-specific choices render cleanly and do not overlap.
 
-## 2) Creator UX and Validation Quality
-- [ ] Block progression on hard errors with clear field-level messaging.
-- [ ] Support warning modal with explicit `Cancel` / `Proceed anyway`.
-- [ ] Persist warning overrides in creator session.
-- [ ] Improve per-step touched-state and required-field behavior.
-- [ ] Reduce confusing field defaults and ambiguous labels.
+### 2) Race and Subrace
+- [ ] Redo page layout and hierarchy.
+- [ ] Ensure race options populate correctly from pack content.
+- [ ] Ensure subrace options populate from selected race metadata.
+- [ ] Ensure subrace hides/clears correctly when race changes.
 
-Acceptance:
-- [ ] Validation behavior is predictable and understandable at every step.
-- [ ] Users can intentionally override warnings with an audit trail.
+### 3) Background and Proficiencies
+- [ ] Redo page layout and hierarchy.
+- [ ] Ensure background options populate correctly.
+- [ ] Improve skill/tool/language pick UX and spacing.
+- [ ] Keep inline `Add Custom` available where supported.
 
-## 3) Lazy Catalog and Performance
-- [ ] Hydrate creator options by step dependencies only.
-- [ ] Warm likely next-step catalogs in background without blocking UI.
-- [ ] Avoid importing full Open5e-heavy chunks during boot.
-- [ ] Keep search/list interactions responsive as catalog size grows.
+### 4) Ability Scores
+- [ ] Redo page layout and hierarchy.
+- [ ] Improve method switching UX (roll, point buy, standard array, manual).
+- [ ] Ensure numeric inputs accept typed values without flicker.
+- [ ] Keep validation feedback clear without blocking navigation.
 
-Acceptance:
-- [ ] Boot and first creator step remain interactive without full dataset hydration.
-- [ ] Later steps feel fast after background warmup.
+### 5) Feats and ASI
+- [ ] Redo page layout and hierarchy.
+- [ ] Improve repeat-group readability and controls.
+- [ ] Ensure feat options populate correctly.
+- [ ] Keep ASI/feat switching clear and stable.
 
-## 4) Inline Custom Additions (Homebrew-in-Flow)
-- [ ] Add `Add Custom` actions directly on relevant creator fields.
-- [ ] Upsert custom entities through overlays and refresh options immediately.
-- [ ] Avoid forcing users into a separate editor flow for common custom additions.
+### 6) Spellcasting
+- [ ] Redo page layout and hierarchy.
+- [ ] Ensure cantrip/spell/spellbook options populate and filter by class plan.
+- [ ] Improve large-list usability and selection clarity.
+- [ ] Keep inline `Add Custom` behavior fast and predictable.
 
-Acceptance:
-- [ ] Custom option appears immediately in the same creator step after creation.
-- [ ] Flow remains uninterrupted.
+### 7) Equipment
+- [ ] Redo page layout and hierarchy.
+- [ ] Ensure package and item options populate correctly.
+- [ ] Improve density for long item lists and multi-select controls.
+- [ ] Keep option loading responsive on large datasets.
 
-## 5) Continuity and Reopen Reliability
-- [ ] Resume interrupted creator sessions per ruleset.
-- [ ] Reopen last opened character automatically on page refresh.
-- [ ] Keep layout fallback/recovery stable and discoverable.
+### 8) About (Profile)
+- [ ] Redo page layout and hierarchy.
+- [ ] Finalize profile fields (name, age, height, weight, appearance, etc.).
+- [ ] Keep this page editable and non-blocking.
+- [ ] Ensure values persist and reopen reliably.
 
-Acceptance:
-- [ ] Refreshing with an open character restores usable sheet state without manual reopen.
-- [ ] Corrupt layout or missing panel state falls back safely.
+## Cross-Cutting Creator Requirements
+- [ ] Keep Back/Next fixed at the sides; only step pills scroll when needed.
+- [ ] Keep step pill styling consistent and readable across desktop/mobile.
+- [ ] Keep users free to navigate steps even with incomplete fields.
+- [ ] Keep creation flow finishable with partial data that can be edited later.
+- [ ] Keep inline `Add Custom` in-flow instead of redirecting to separate tools.
+- [ ] Preserve pack-driven behavior (no hardcoded SRD-only UI logic).
+
+## Verification for Each Page Redesign
+- [ ] Build succeeds (`pnpm run build`).
+- [ ] Tests pass (`pnpm test`).
+- [ ] No new obvious TypeScript errors.
+- [ ] Manual check: no overlap/overflow in creator viewport.
+- [ ] Manual check: step opens/reopens at expected position.
 
 ## Already Landed (Baseline)
 - [x] Metadata-first app boot and deferred heavy hydration.

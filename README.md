@@ -10,13 +10,13 @@ Baseline P0 usability plumbing is in place:
 
 Current product gap:
 - Character creator UX is still incomplete/janky and is the primary near-term focus.
-- Next work targets a full, pack-driven, Roll20-like creator flow with strict validation and smooth step progression.
+- Next work targets a full, pack-driven, Roll20-like creator flow with smooth step progression and page-by-page redesign.
 
 Tracking document:
 - `TODO.md`
 
 ## What This Version Includes
-- V2.1 pack runtime with strict validation and deterministic pack overlays.
+- V2.1 pack runtime with validation/warning support and deterministic pack overlays.
 - Dockview-based workspace UI with responsive fallback.
 - Built-in SRD core packs:
   - `dnd_srd_5e_2014`
@@ -29,8 +29,9 @@ Tracking document:
 - Open5e ingestion pipeline and canonical compiler scaffolding.
 
 ## Immediate Product Focus
-- Complete creator coverage for SRD 2014 (identity, level plan, ability scores, race/subrace, background, class/subclass, feats/ASI, spells, equipment, review).
-- Improve creator interaction quality (validation clarity, warning override UX, resume reliability).
+- Complete creator coverage for SRD 2014 (class plan/subclass, race/subrace, background, ability scores, feats/ASI, spells, equipment, about/profile).
+- Redesign each creator page one-by-one for better density, hierarchy, and usability.
+- Keep creator navigation non-blocking so users can continue and edit details later.
 - Keep creator catalogs lazy and step-scoped (no full dataset load at boot or creator start).
 - Prefer inline `Add Custom` in creator fields for homebrew additions.
 

@@ -5,8 +5,8 @@ Character creation must be fully pack-defined and complete enough for real table
 
 ## Current State
 - Creator schema/runtime exists and supports multi-step flow.
-- SRD 2014 creator still feels incomplete/janky for end users.
-- Near-term priority is to make creator quality comparable to Roll20-style guided creation while remaining system-agnostic.
+- SRD 2014 creator currently uses pack-defined steps with bottom step navigation and inline custom additions.
+- Near-term priority is to redesign creator pages one-by-one while keeping the flow pack-driven and system-agnostic.
 
 ## Config
 `creator` block defines:
@@ -14,7 +14,7 @@ Character creation must be fully pack-defined and complete enough for real table
 - fields
 - required constraints
 - seed bindings (`bindTo`)
-- rules/warnings and override behavior
+- rules/warnings behavior
 
 ## Runtime
 - `startCharacterCreator(rulesetId)`
@@ -27,23 +27,25 @@ Character creation must be fully pack-defined and complete enough for real table
 If no creator is defined, RPGForge uses a minimal fallback creator.
 
 ## Required Improvements (Current Priority)
-- Complete SRD 2014 flow coverage:
-  - identity
-  - level/multiclass planning
-  - ability score methods
-  - race/background/class/subclass choices
-  - feats/ASI
-  - spells
+- Redesign each SRD 2014 creator page in sequence:
+  - class plan and subclasses
+  - race and subrace
+  - background and proficiencies
+  - ability scores
+  - feats and ASI
+  - spellcasting
   - equipment
-  - review/create
-- Stronger UX:
-  - predictable validation
-  - clear per-field errors
-  - warning override modal (`Cancel` / `Proceed anyway`)
-  - smoother step transitions
-- Lazy data:
+  - about/profile
+- Keep navigation fluid:
+  - users can move between pages even with incomplete fields
+  - users can finish and edit later in sheet/runtime
+- Improve UX quality:
+  - clearer hierarchy and spacing
+  - predictable field behavior and input handling
+  - stable scrolling and non-overlapping layouts
+- Keep data loading lazy:
   - load only step-relevant catalogs
   - prewarm likely next step in background
-- Inline custom creation:
+- Keep inline custom creation:
   - `Add Custom` directly on creator fields where needed
   - immediate option-list refresh without leaving flow

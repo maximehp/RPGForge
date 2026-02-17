@@ -24,7 +24,9 @@ This file defines how humans and coding agents should collaborate in this reposi
 
 ## Current Focus (Next Thread)
 - Primary focus is character creator completeness and UX quality.
-- Target experience: pack-driven flow with Roll20-like completeness (level, class/subclass, race, background, feats/ASI, spells, equipment, review).
+- Target experience: pack-driven flow with Roll20-like completeness (class/subclass, race, background, feats/ASI, spells, equipment, about/profile).
+- Redesign creator pages one-by-one as independent milestones.
+- Keep creator navigation non-blocking so incomplete fields can be edited later.
 - Prioritize removing jank in step transitions, validation feedback, and reopen/session continuity.
 - Keep creator data loading step-scoped and lazy (load only what is needed when it is needed).
 - Prefer inline `Add Custom` actions directly in creator fields over separate homebrew editor flows unless explicitly requested.
