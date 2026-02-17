@@ -698,8 +698,8 @@ button, input, select {
 }
 
 .creator-step-pill:hover:not(.is-disabled):not(:disabled) {
-    border-color: var(--accent-a);
-    background: rgba(73, 215, 217, 0.12);
+    border-color: rgba(73, 215, 217, 0.52);
+    background: rgba(73, 215, 217, 0.07);
 }
 
 .creator-step-pill span {
