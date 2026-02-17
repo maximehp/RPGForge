@@ -22,6 +22,7 @@ import { RecentCharacters } from "./RecentCharacters";
 
 type AppRoute =
     | { page: "home" }
+    | { page: "packs" }
     | { page: "characters" }
     | { page: "creator" }
     | { page: "sheet"; characterId: string };
@@ -31,6 +32,7 @@ const LAST_OPEN_CHARACTER_STORAGE_KEY = "rpgforge:last-open-character-id";
 function parseRoute(pathname: string): AppRoute {
     const parts = pathname.split("/").filter(Boolean);
     if (!parts.length) return { page: "home" };
+    if (parts[0] === "packs") return { page: "packs" };
     if (parts[0] === "create") return { page: "creator" };
     if (parts[0] === "characters" && parts[1]) return { page: "sheet", characterId: decodeURIComponent(parts[1]) };
     if (parts[0] === "characters") return { page: "characters" };
@@ -39,6 +41,7 @@ function parseRoute(pathname: string): AppRoute {
 
 function routePath(route: AppRoute): string {
     if (route.page === "home") return "/";
+    if (route.page === "packs") return "/packs";
     if (route.page === "creator") return "/create";
     if (route.page === "characters") return "/characters";
     return `/characters/${encodeURIComponent(route.characterId)}`;
@@ -380,37 +383,39 @@ export function V2App() {
     return (
         <div className="app-shell">
             <header className="topbar glass-surface">
-                <div className="title-block">
-                    <h1>RPGForge V2.1</h1>
-                    <p>{status}</p>
-                </div>
+                <a
+                    href="/"
+                    className="topbar-logo"
+                    onClick={event => {
+                        event.preventDefault();
+                        navigate({ page: "home" });
+                    }}
+                >
+                    rpgforge
+                </a>
 
-                <div className="topbar-controls">
-                    <label>
-                        Ruleset
-                        <select value={selectedPack} onChange={e => setSelectedPack(resolvePackAlias(e.target.value))}>
-                            {packOptions.map(id => (
-                                <option key={id} value={id}>{id}</option>
-                            ))}
-                        </select>
-                    </label>
-
-                    <button className="glass-btn" onClick={() => void beginCreator(selectedPack)}>New Character</button>
-                    <button className="glass-btn secondary" onClick={() => navigate({ page: "characters" })}>Open Character</button>
-                    <button className="glass-btn secondary" onClick={() => navigate({ page: "home" })}>Home</button>
-
-                    <label className="import-label">
-                        Import .gpack
-                        <input
-                            type="file"
-                            accept=".gpack"
-                            onChange={e => {
-                                const f = e.currentTarget.files?.[0];
-                                if (f) void onImportPack(f);
-                            }}
-                        />
-                    </label>
-                </div>
+                <nav className="topbar-nav" aria-label="Primary">
+                    <a
+                        href="/characters"
+                        className={`topbar-link ${route.page === "characters" || route.page === "sheet" ? "is-active" : ""}`}
+                        onClick={event => {
+                            event.preventDefault();
+                            navigate({ page: "characters" });
+                        }}
+                    >
+                        Characters
+                    </a>
+                    <a
+                        href="/packs"
+                        className={`topbar-link ${route.page === "packs" ? "is-active" : ""}`}
+                        onClick={event => {
+                            event.preventDefault();
+                            navigate({ page: "packs" });
+                        }}
+                    >
+                        Packs
+                    </a>
+                </nav>
             </header>
             <main className="app-main">
                 {error ? (
@@ -430,15 +435,49 @@ export function V2App() {
                     <section className="home-shell">
                         <section className="glass-surface home-card">
                             <div className="home-card-header">
-                                <h2>Open Character</h2>
+                                <h2>Home</h2>
                                 <button className="glass-btn" onClick={() => navigate({ page: "characters" })}>Browse All</button>
                             </div>
-                            <p className="home-muted">Choose an existing character or create a new one with your selected ruleset.</p>
+                            <p className="home-muted">{status}</p>
                             <div className="home-actions">
                                 <button className="glass-btn" onClick={() => void beginCreator(selectedPack)}>Create New Character</button>
+                                <button className="glass-btn secondary" onClick={() => navigate({ page: "packs" })}>Manage Packs</button>
                             </div>
                         </section>
                         <RecentCharacters rows={recentCharacters} onOpen={id => void openCharacterById(id)} onBrowseAll={() => navigate({ page: "characters" })} />
+                    </section>
+                ) : null}
+
+                {route.page === "packs" ? (
+                    <section className="home-shell">
+                        <section className="glass-surface home-card">
+                            <div className="home-card-header">
+                                <h2>Packs</h2>
+                            </div>
+                            <p className="home-muted">Choose the active ruleset for creation and import additional `.gpack` files.</p>
+                            <div className="home-actions">
+                                <label>
+                                    Ruleset
+                                    <select value={selectedPack} onChange={e => setSelectedPack(resolvePackAlias(e.target.value))}>
+                                        {packOptions.map(id => (
+                                            <option key={id} value={id}>{id}</option>
+                                        ))}
+                                    </select>
+                                </label>
+                                <label className="import-label">
+                                    Import .gpack
+                                    <input
+                                        type="file"
+                                        accept=".gpack"
+                                        onChange={e => {
+                                            const f = e.currentTarget.files?.[0];
+                                            if (f) void onImportPack(f);
+                                        }}
+                                    />
+                                </label>
+                                <button className="glass-btn" onClick={() => void beginCreator(selectedPack)}>Create Character</button>
+                            </div>
+                        </section>
                     </section>
                 ) : null}
 

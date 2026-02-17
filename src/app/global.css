@@ -1,5 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap");
 
+@font-face {
+    font-family: "Space Astronomy";
+    src: url("./fonts/SpaceAndAstronomy-pZRD.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
 :root {
     --bg-0: #0e1a2a;
     --bg-1: #1b2f49;
@@ -71,43 +79,55 @@ button, input, select {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 18px;
-    padding: 14px 18px;
+    gap: 14px;
+    padding: 12px 18px;
 }
 
-.title-block h1 {
+.topbar-logo {
     margin: 0;
-    font-family: "Space Grotesk", "Manrope", sans-serif;
-    letter-spacing: 0.02em;
-    font-size: 1.35rem;
+    border: 0;
+    padding: 2px 0;
+    text-decoration: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-family: "Space Astronomy", "Space Grotesk", "Manrope", sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    font-size: 1.55rem;
+    line-height: 1;
 }
 
-.title-block p {
-    margin: 2px 0 0;
-    color: var(--muted);
-    font-size: 0.92rem;
+.topbar-logo:hover {
+    color: #fff;
 }
 
-.topbar-controls {
+.topbar-nav {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
-.topbar label {
-    display: grid;
-    gap: 6px;
+.topbar-link {
+    margin: 0;
+    border: 0;
+    padding: 6px 2px;
+    text-decoration: none;
+    background: transparent;
     color: var(--muted);
-    font-size: 0.82rem;
+    cursor: pointer;
+    font-size: 0.94rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
-.topbar select,
-.topbar input[type="file"] {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    padding: 8px 10px;
+.topbar-link:hover {
+    color: #fff;
+}
+
+.topbar-link.is-active {
+    color: var(--accent-a);
 }
 
 .error-banner {
@@ -160,6 +180,22 @@ button, input, select {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.home-actions label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.home-actions select,
+.home-actions input[type="file"] {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 8px 10px;
 }
 
 .character-list {
@@ -620,9 +656,6 @@ button, input, select {
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--radius-lg);
-    background:
-        radial-gradient(900px 520px at 18% 0%, rgba(73, 215, 217, 0.12), transparent 55%),
-        linear-gradient(165deg, rgba(22, 39, 60, 0.78), rgba(16, 31, 49, 0.86));
 }
 
 .creator-header h2 {
@@ -865,13 +898,15 @@ button, input, select {
 
 @media (max-width: 1024px) {
     .topbar {
-        flex-direction: column;
-        align-items: stretch;
+        padding: 10px 14px;
     }
 
-    .topbar-controls {
-        justify-content: space-between;
-        flex-wrap: wrap;
+    .topbar-logo {
+        font-size: 1.25rem;
+    }
+
+    .topbar-link {
+        font-size: 0.84rem;
     }
 }
 
