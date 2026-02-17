@@ -169,7 +169,6 @@ export function V2App() {
     const [status, setStatus] = React.useState<string>("Booting...");
     const [error, setError] = React.useState<string>("");
     const [lastOpenCharacterId, setLastOpenCharacterId] = React.useState<string>("");
-    const attemptedAutoRestoreRef = React.useRef(false);
     const attemptedRouteLoadRef = React.useRef<string>("");
 
     const navigate = React.useCallback((next: AppRoute, options?: { replace?: boolean }) => {
@@ -290,18 +289,6 @@ export function V2App() {
             setStatus("Failed to open character");
         }
     }, [navigate, refreshRecent]);
-
-    React.useEffect(() => {
-        if (import.meta.env.MODE === "test") return;
-        if (attemptedAutoRestoreRef.current) return;
-        if (!packOptions.length) return;
-        if (character) return;
-        if (route.page !== "home") return;
-        const characterId = readLastOpenCharacterId();
-        if (!characterId) return;
-        attemptedAutoRestoreRef.current = true;
-        void openCharacterById(characterId);
-    }, [character, openCharacterById, packOptions.length, route.page]);
 
     React.useEffect(() => {
         attemptedRouteLoadRef.current = "";
