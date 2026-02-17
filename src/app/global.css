@@ -679,7 +679,9 @@ button, input, select {
 }
 
 .creator-step-pill {
-    flex: 0 0 170px;
+    flex: 1 1 160px;
+    min-width: 120px;
+    max-width: 220px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.03);
@@ -791,9 +793,12 @@ button, input, select {
     aspect-ratio: 1 / 1;
     min-height: 74px;
     text-align: center;
-    align-content: center;
-    justify-items: center;
+    display: grid;
+    place-items: center;
     padding: 8px 6px;
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: none;
 }
 
 .creator-error {
@@ -923,6 +928,11 @@ button, input, select {
 
     .creator-bottom-nav .creator-step-nav:last-child {
         order: 2;
+    }
+
+    .creator-step-nav {
+        aspect-ratio: auto;
+        min-height: 44px;
     }
 
     .creator-fields {

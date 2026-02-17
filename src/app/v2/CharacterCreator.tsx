@@ -910,7 +910,6 @@ export function CharacterCreator(props: Props) {
                     disabled={stepIndex <= 0}
                     onClick={goBack}
                 >
-                    <span>Prev</span>
                     <strong>Back</strong>
                 </button>
 
@@ -934,7 +933,6 @@ export function CharacterCreator(props: Props) {
                         type="button"
                         onClick={() => void goForward()}
                     >
-                        <span>Move</span>
                         <strong>Next</strong>
                     </button>
                 ) : (
@@ -943,8 +941,7 @@ export function CharacterCreator(props: Props) {
                         type="button"
                         onClick={() => void finishCreation()}
                     >
-                        <span>Finish</span>
-                        <strong>Create</strong>
+                        <strong>Next</strong>
                     </button>
                 )}
             </section>
