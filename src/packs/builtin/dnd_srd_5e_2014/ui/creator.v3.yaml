@@ -1,7 +1,7 @@
 creator:
   schemaVersion: "3.0.0"
   title: D&D SRD 2014 Character Creator
-  description: Roll20-style guided flow with strict validation and in-flow custom options.
+  description: Guided flow with strict validation and in-flow custom options.
   rules:
     - id: level-range
       severity: error

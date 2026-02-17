@@ -799,6 +799,13 @@ button, input, select {
     flex: 0 0 auto;
     min-width: 0;
     max-width: none;
+    transition: background 150ms ease, border-color 150ms ease, transform 120ms ease;
+}
+
+.creator-step-nav:hover:not(:disabled) {
+    border-color: var(--accent-a);
+    background: rgba(73, 215, 217, 0.2);
+    transform: translateY(-1px);
 }
 
 .creator-error {

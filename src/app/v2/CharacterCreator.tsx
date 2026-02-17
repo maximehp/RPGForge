@@ -650,16 +650,11 @@ export function CharacterCreator(props: Props) {
         setStepIndex(index => Math.max(0, index - 1));
     }, []);
     const goForward = React.useCallback(async () => {
-        const localErrorKeys = Object.keys(errors);
-        if (localErrorKeys.length > 0) {
-            markStepTouched();
-            setFocusErrorKey(localErrorKeys[0]);
-            return;
-        }
-        const ok = await validateBeforeAdvance("next");
-        if (!ok) return;
+        await updateCreatorSessionSelection(props.sessionId, seed).catch(() => {
+            // Persist failures should not block stepping.
+        });
         setStepIndex(index => Math.min(totalSteps - 1, index + 1));
-    }, [errors, totalSteps]);
+    }, [props.sessionId, seed, totalSteps]);
     const finishCreation = React.useCallback(async () => {
         const localErrorKeys = Object.keys(errors);
         if (localErrorKeys.length > 0) {
