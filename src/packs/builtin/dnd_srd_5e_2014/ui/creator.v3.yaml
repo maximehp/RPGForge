@@ -7,43 +7,6 @@ creator:
       when: "size(class_plan) > 0 and (level_total < 1 or level_total > 20)"
       message: "Total character level must be between 1 and 20."
   steps:
-    - id: identity
-      title: Identity
-      description: Name your character and define campaign setup toggles.
-      fields:
-        - id: name
-          label: Character Name
-          type: text
-          bindTo: name
-          required: true
-          default: New Adventurer
-        - id: allow_multiclass
-          label: Multiclass Enabled (Campaign Rule)
-          type: toggle
-          bindTo: allow_multiclass
-          default: true
-
-    - id: ancestry
-      title: Race and Subrace
-      preloadContentTypes: [races]
-      searchContentTypes: [races]
-      fields:
-        - id: race_id
-          label: Race
-          type: select
-          bindTo: race_id
-          required: true
-          options:
-            kind: content
-            contentType: races
-        - id: subrace_id
-          label: Subrace
-          type: select
-          bindTo: subrace_id
-          options:
-            kind: expression
-            expression: "selectedRaceSubraces"
-
     - id: class_plan
       title: Class Plan and Subclasses
       preloadContentTypes: [classes]
@@ -152,6 +115,27 @@ creator:
             - id: choice_value
               label: Chosen Option
               type: text
+
+    - id: ancestry
+      title: Race and Subrace
+      preloadContentTypes: [races]
+      searchContentTypes: [races]
+      fields:
+        - id: race_id
+          label: Race
+          type: select
+          bindTo: race_id
+          required: true
+          options:
+            kind: content
+            contentType: races
+        - id: subrace_id
+          label: Subrace
+          type: select
+          bindTo: subrace_id
+          options:
+            kind: expression
+            expression: "selectedRaceSubraces"
 
     - id: background
       title: Background and Proficiencies
@@ -350,12 +334,33 @@ creator:
             kind: content
             contentType: items
 
-    - id: review
-      title: Review and Confirm
-      description: Review your selections and confirm creation.
+    - id: about
+      title: About
+      description: Character profile details that can be edited later.
       fields:
-        - id: review_ack
-          label: I have reviewed this build
+        - id: name
+          label: Character Name
+          type: text
+          bindTo: name
+          default: New Adventurer
+        - id: age
+          label: Age
+          type: number
+          bindTo: age
+        - id: height
+          label: Height
+          type: text
+          bindTo: height
+        - id: weight
+          label: Weight
+          type: text
+          bindTo: weight
+        - id: appearance
+          label: Appearance
+          type: text
+          bindTo: appearance
+        - id: allow_multiclass
+          label: Multiclass Enabled (Campaign Rule)
           type: toggle
-          bindTo: review_ack
-          required: true
+          bindTo: allow_multiclass
+          default: true

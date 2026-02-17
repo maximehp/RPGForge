@@ -682,6 +682,7 @@ button, input, select {
     flex: 1 1 160px;
     min-width: 120px;
     max-width: 220px;
+    min-height: 84px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.03);
@@ -690,6 +691,8 @@ button, input, select {
     gap: 2px;
     text-align: left;
     padding: 10px;
+    cursor: pointer;
+    transition: background 150ms ease, border-color 150ms ease, transform 120ms ease;
 }
 
 .creator-step-pill span {
@@ -790,8 +793,9 @@ button, input, select {
 
 .creator-step-nav {
     width: 100%;
+    height: 84px;
     aspect-ratio: 1 / 1;
-    min-height: 74px;
+    min-height: 84px;
     text-align: center;
     display: grid;
     place-items: center;
@@ -800,6 +804,16 @@ button, input, select {
     min-width: 0;
     max-width: none;
     transition: background 150ms ease, border-color 150ms ease, transform 120ms ease;
+}
+
+.creator-stepper .creator-step-pill {
+    height: 84px;
+}
+
+.creator-stepper .creator-step-pill:hover {
+    border-color: var(--accent-a);
+    background: rgba(73, 215, 217, 0.2);
+    transform: translateY(-1px);
 }
 
 .creator-step-nav:hover:not(:disabled) {
@@ -939,7 +953,14 @@ button, input, select {
 
     .creator-step-nav {
         aspect-ratio: auto;
+        height: 44px;
         min-height: 44px;
+    }
+
+    .creator-step-pill,
+    .creator-stepper .creator-step-pill {
+        min-height: 44px;
+        height: 44px;
     }
 
     .creator-fields {
