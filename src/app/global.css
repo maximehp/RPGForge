@@ -674,6 +674,7 @@ button, input, select {
     gap: 8px;
     min-width: 0;
     overflow-x: auto;
+    overflow-y: hidden;
     scrollbar-width: thin;
     padding-bottom: 2px;
 }
@@ -688,11 +689,18 @@ button, input, select {
     background: rgba(255, 255, 255, 0.03);
     color: var(--text);
     display: grid;
+    align-content: start;
     gap: 2px;
     text-align: left;
     padding: 10px;
     cursor: pointer;
     transition: background 150ms ease, border-color 150ms ease, transform 120ms ease;
+}
+
+.creator-step-pill:hover:not(.is-disabled):not(:disabled) {
+    border-color: var(--accent-a);
+    background: rgba(73, 215, 217, 0.2);
+    transform: translateY(-1px);
 }
 
 .creator-step-pill span {
@@ -796,30 +804,14 @@ button, input, select {
     height: 84px;
     aspect-ratio: 1 / 1;
     min-height: 84px;
-    text-align: center;
-    display: grid;
-    place-items: center;
-    padding: 8px 6px;
+    padding: 10px;
     flex: 0 0 auto;
     min-width: 0;
     max-width: none;
-    transition: background 150ms ease, border-color 150ms ease, transform 120ms ease;
 }
 
 .creator-stepper .creator-step-pill {
     height: 84px;
-}
-
-.creator-stepper .creator-step-pill:hover {
-    border-color: var(--accent-a);
-    background: rgba(73, 215, 217, 0.2);
-    transform: translateY(-1px);
-}
-
-.creator-step-nav:hover:not(:disabled) {
-    border-color: var(--accent-a);
-    background: rgba(73, 215, 217, 0.2);
-    transform: translateY(-1px);
 }
 
 .creator-error {
@@ -936,31 +928,23 @@ button, input, select {
     }
 
     .creator-bottom-nav {
-        grid-template-columns: 1fr;
-    }
-
-    .creator-stepper {
-        order: 1;
-    }
-
-    .creator-bottom-nav .creator-step-nav:first-child {
-        order: 0;
-    }
-
-    .creator-bottom-nav .creator-step-nav:last-child {
-        order: 2;
+        grid-template-columns: 56px minmax(0, 1fr) 56px;
+        gap: 8px;
+        padding: 8px;
     }
 
     .creator-step-nav {
-        aspect-ratio: auto;
-        height: 44px;
-        min-height: 44px;
+        aspect-ratio: 1 / 1;
+        height: 56px;
+        min-height: 56px;
+        padding: 8px;
     }
 
     .creator-step-pill,
     .creator-stepper .creator-step-pill {
-        min-height: 44px;
-        height: 44px;
+        min-height: 56px;
+        height: 56px;
+        padding: 8px;
     }
 
     .creator-fields {
