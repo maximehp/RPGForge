@@ -20,8 +20,29 @@ import { CharacterCreator } from "./CharacterCreator";
 import { CharacterBrowser } from "./CharacterBrowser";
 import { RecentCharacters } from "./RecentCharacters";
 
-type AppView = "home" | "characters" | "creator" | "sheet";
+type AppRoute =
+    | { page: "home" }
+    | { page: "characters" }
+    | { page: "creator" }
+    | { page: "sheet"; characterId: string };
+
 const LAST_OPEN_CHARACTER_STORAGE_KEY = "rpgforge:last-open-character-id";
+
+function parseRoute(pathname: string): AppRoute {
+    const parts = pathname.split("/").filter(Boolean);
+    if (!parts.length) return { page: "home" };
+    if (parts[0] === "create") return { page: "creator" };
+    if (parts[0] === "characters" && parts[1]) return { page: "sheet", characterId: decodeURIComponent(parts[1]) };
+    if (parts[0] === "characters") return { page: "characters" };
+    return { page: "home" };
+}
+
+function routePath(route: AppRoute): string {
+    if (route.page === "home") return "/";
+    if (route.page === "creator") return "/create";
+    if (route.page === "characters") return "/characters";
+    return `/characters/${encodeURIComponent(route.characterId)}`;
+}
 
 function readLastOpenCharacterId(): string {
     try {
@@ -135,7 +156,7 @@ class SheetErrorBoundary extends React.Component<{
 }
 
 export function V2App() {
-    const [view, setView] = React.useState<AppView>("home");
+    const [route, setRoute] = React.useState<AppRoute>(() => parseRoute(window.location.pathname));
     const [packOptions, setPackOptions] = React.useState<string[]>([]);
     const [selectedPack, setSelectedPack] = React.useState<string>("");
     const [ruleset, setRuleset] = React.useState<ResolvedRuleset | null>(null);
@@ -149,6 +170,28 @@ export function V2App() {
     const [error, setError] = React.useState<string>("");
     const [lastOpenCharacterId, setLastOpenCharacterId] = React.useState<string>("");
     const attemptedAutoRestoreRef = React.useRef(false);
+    const attemptedRouteLoadRef = React.useRef<string>("");
+
+    const navigate = React.useCallback((next: AppRoute, options?: { replace?: boolean }) => {
+        const path = routePath(next);
+        const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+        if (current !== path) {
+            if (options?.replace) {
+                window.history.replaceState(null, "", path);
+            } else {
+                window.history.pushState(null, "", path);
+            }
+        }
+        setRoute(next);
+    }, []);
+
+    React.useEffect(() => {
+        const onPopState = () => {
+            setRoute(parseRoute(window.location.pathname));
+        };
+        window.addEventListener("popstate", onPopState);
+        return () => window.removeEventListener("popstate", onPopState);
+    }, []);
 
     const refreshRecent = React.useCallback(async () => {
         const rows = await getRecentCharacters(8);
@@ -210,14 +253,14 @@ export function V2App() {
             setCreatorSession(session);
             setCreatorSeed(session.seed || {});
             setCreatorRefreshToken(0);
-            setView("creator");
+            navigate({ page: "creator" });
             setStatus(`Creating character for ${rs.id}`);
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
             setError(msg);
             setStatus("Failed to initialize creator");
         }
-    }, []);
+    }, [navigate]);
 
     const openCharacterById = React.useCallback(async (characterId: string, options: OpenCharacterOptions = {}) => {
         try {
@@ -233,7 +276,7 @@ export function V2App() {
             setCreatorSession(null);
             setCreatorSeed({});
             setCreatorRefreshToken(0);
-            setView("sheet");
+            navigate({ page: "sheet", characterId: result.character.meta.id });
             writeLastOpenCharacterId(result.character.meta.id);
             await refreshRecent();
             setStatus(result.warnings.length ? `Opened with warnings: ${result.warnings.join(" ")}` : `Loaded ${result.character.meta.name}`);
@@ -246,19 +289,44 @@ export function V2App() {
             setError(msg);
             setStatus("Failed to open character");
         }
-    }, [refreshRecent]);
+    }, [navigate, refreshRecent]);
 
     React.useEffect(() => {
         if (import.meta.env.MODE === "test") return;
         if (attemptedAutoRestoreRef.current) return;
         if (!packOptions.length) return;
         if (character) return;
-        if (view !== "home") return;
+        if (route.page !== "home") return;
         const characterId = readLastOpenCharacterId();
         if (!characterId) return;
         attemptedAutoRestoreRef.current = true;
         void openCharacterById(characterId);
-    }, [character, openCharacterById, packOptions.length, view]);
+    }, [character, openCharacterById, packOptions.length, route.page]);
+
+    React.useEffect(() => {
+        attemptedRouteLoadRef.current = "";
+    }, [route.page, route.page === "sheet" ? route.characterId : ""]);
+
+    React.useEffect(() => {
+        if (route.page !== "creator") return;
+        if (creatorSession) return;
+        if (!selectedPack) return;
+        const key = `creator:${selectedPack}`;
+        if (attemptedRouteLoadRef.current === key) return;
+        attemptedRouteLoadRef.current = key;
+        void beginCreator(selectedPack);
+    }, [beginCreator, creatorSession, route.page, selectedPack]);
+
+    React.useEffect(() => {
+        if (route.page !== "sheet") return;
+        const targetId = route.characterId;
+        if (!targetId) return;
+        if (character?.meta.id === targetId) return;
+        const key = `sheet:${targetId}`;
+        if (attemptedRouteLoadRef.current === key) return;
+        attemptedRouteLoadRef.current = key;
+        void openCharacterById(targetId);
+    }, [character?.meta.id, openCharacterById, route.page, route.page === "sheet" ? route.characterId : ""]);
 
     const onImportPack = async (file: File) => {
         const report = await importPackBundle(file);
@@ -305,14 +373,14 @@ export function V2App() {
             setLastOpenCharacterId(doc.meta.id);
             writeLastOpenCharacterId(doc.meta.id);
             setLayoutState(undefined);
-            setView("sheet");
+            navigate({ page: "sheet", characterId: doc.meta.id });
             await refreshRecent();
             setStatus(`Loaded ${ruleset.id}`);
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
             setError(msg);
         }
-    }, [creatorSession, refreshRecent, ruleset]);
+    }, [creatorSession, navigate, refreshRecent, ruleset]);
 
     const onCreatorSeedChange = React.useCallback((seed: Record<string, unknown>) => {
         setCreatorSeed(seed);
@@ -341,8 +409,8 @@ export function V2App() {
                     </label>
 
                     <button className="glass-btn" onClick={() => void beginCreator(selectedPack)}>New Character</button>
-                    <button className="glass-btn secondary" onClick={() => setView("characters")}>Open Character</button>
-                    <button className="glass-btn secondary" onClick={() => setView("home")}>Home</button>
+                    <button className="glass-btn secondary" onClick={() => navigate({ page: "characters" })}>Open Character</button>
+                    <button className="glass-btn secondary" onClick={() => navigate({ page: "home" })}>Home</button>
 
                     <label className="import-label">
                         Import .gpack
@@ -371,34 +439,34 @@ export function V2App() {
                     </div>
                 ) : null}
 
-                {view === "home" ? (
+                {route.page === "home" ? (
                     <section className="home-shell">
                         <section className="glass-surface home-card">
                             <div className="home-card-header">
                                 <h2>Open Character</h2>
-                                <button className="glass-btn" onClick={() => setView("characters")}>Browse All</button>
+                                <button className="glass-btn" onClick={() => navigate({ page: "characters" })}>Browse All</button>
                             </div>
                             <p className="home-muted">Choose an existing character or create a new one with your selected ruleset.</p>
                             <div className="home-actions">
                                 <button className="glass-btn" onClick={() => void beginCreator(selectedPack)}>Create New Character</button>
                             </div>
                         </section>
-                        <RecentCharacters rows={recentCharacters} onOpen={id => void openCharacterById(id)} onBrowseAll={() => setView("characters")} />
+                        <RecentCharacters rows={recentCharacters} onOpen={id => void openCharacterById(id)} onBrowseAll={() => navigate({ page: "characters" })} />
                     </section>
                 ) : null}
 
-                {view === "characters" ? (
+                {route.page === "characters" ? (
                     <CharacterBrowser
                         rulesetOptions={packOptions}
                         onOpen={id => void openCharacterById(id)}
                         onBack={() => {
                             void refreshRecent();
-                            setView("home");
+                            navigate({ page: "home" });
                         }}
                     />
                 ) : null}
 
-                {view === "creator" && ruleset && creatorSession ? (
+                {route.page === "creator" && ruleset && creatorSession ? (
                     <CharacterCreator
                         preset={ruleset.creator as CharacterCreatorPresetV3}
                         sessionId={creatorSession.id}
@@ -407,11 +475,11 @@ export function V2App() {
                         refreshToken={creatorRefreshToken}
                         onSeedChange={onCreatorSeedChange}
                         onComplete={onCompleteCreator}
-                        onCancel={() => setView("home")}
+                        onCancel={() => navigate({ page: "home" })}
                     />
                 ) : null}
 
-                {view === "sheet" && ruleset && character ? (
+                {route.page === "sheet" && ruleset && character ? (
                     ruleset.ui.panels.length === 0 || ruleset.ui.layout.groups.length === 0 ? (
                         <BasicSheetView
                             character={character}
@@ -438,6 +506,14 @@ export function V2App() {
                             />
                         </SheetErrorBoundary>
                     )
+                ) : null}
+
+                {route.page === "sheet" && (!ruleset || !character) ? (
+                    <div className="loading-state">Loading character...</div>
+                ) : null}
+
+                {route.page === "creator" && (!ruleset || !creatorSession) ? (
+                    <div className="loading-state">Preparing creator...</div>
                 ) : null}
 
                 {!packOptions.length ? <div className="loading-state">Loading ruleset metadata...</div> : null}
