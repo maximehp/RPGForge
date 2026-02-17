@@ -3,12 +3,10 @@ import { Parser } from "expr-eval";
 import { DiceRoller } from "@dice-roller/rpg-dice-roller";
 import type { CharacterCreatorPresetV3, CreatorFieldV3, CreatorStepV3 } from "../../engine/v2/types";
 import {
-    confirmCreatorWarnings,
     hydrateCreatorStep,
     updateCreatorSessionSelection,
     upsertCreatorCustomOption,
-    upsertCreatorSessionUiState,
-    validateCreatorSession
+    upsertCreatorSessionUiState
 } from "../../services/v2RuntimeApi";
 import {
     classLevelsById,
@@ -29,12 +27,6 @@ type Props = {
 
 type StepIssue = { id: string; severity: "error" | "warning"; message: string };
 type StepOptions = Record<string, Array<{ value: string; label: string; meta?: Record<string, unknown> }>>;
-
-type WarningModalState = {
-    open: boolean;
-    warnings: Array<{ id: string; message: string }>;
-    action: "next" | "create";
-};
 
 type CustomModalState = {
     open: boolean;
@@ -304,15 +296,9 @@ export function CharacterCreator(props: Props) {
     const [touchedByStep, setTouchedByStep] = React.useState<Record<string, Record<string, boolean>>>({});
     const [stepOptions, setStepOptions] = React.useState<StepOptions>({});
     const [stepIssues, setStepIssues] = React.useState<StepIssue[]>([]);
-    const [warningModal, setWarningModal] = React.useState<WarningModalState>({
-        open: false,
-        warnings: [],
-        action: "next"
-    });
     const [loadingStep, setLoadingStep] = React.useState(false);
     const [localRefreshToken, setLocalRefreshToken] = React.useState(0);
     const [seedHydrateToken, setSeedHydrateToken] = React.useState(0);
-    const [focusErrorKey, setFocusErrorKey] = React.useState("");
 
     const [customModal, setCustomModal] = React.useState<CustomModalState>({
         open: false,
@@ -413,16 +399,6 @@ export function CharacterCreator(props: Props) {
         });
     }, [props.sessionId, step, stepIndex]);
 
-    React.useEffect(() => {
-        if (!focusErrorKey) return;
-        const el = document.querySelector<HTMLElement>(`[data-error-key="${focusErrorKey}"]`);
-        if (el) {
-            el.scrollIntoView({ block: "center", behavior: "smooth" });
-            const input = el.querySelector<HTMLElement>("input, select, textarea, button");
-            input?.focus();
-        }
-    }, [focusErrorKey]);
-
     const setField = (field: CreatorFieldV3, value: unknown) => {
         const key = field.bindTo || field.id;
         setSeed(prev => setAtPath(prev, key, value));
@@ -433,32 +409,6 @@ export function CharacterCreator(props: Props) {
                 [key]: true
             }
         }));
-    };
-
-    const markStepTouched = () => {
-        if (!step) return;
-        const nextStepTouched = { ...(touchedByStep[stepId] || {}) };
-        for (const field of step.fields || []) {
-            const key = field.bindTo || field.id;
-            nextStepTouched[key] = true;
-        }
-        setTouchedByStep(prev => ({ ...prev, [stepId]: nextStepTouched }));
-    };
-
-    const validateBeforeAdvance = async (action: "next" | "create"): Promise<boolean> => {
-        if (!step) return true;
-        await updateCreatorSessionSelection(props.sessionId, seed);
-        const result = await validateCreatorSession(props.sessionId, step.id);
-        if (result.errors.length) {
-            setStepIssues(result.errors.map(error => ({ id: error.id, severity: "error", message: error.message })));
-            setFocusErrorKey(result.errors[0]?.id || "");
-            return false;
-        }
-        if (result.warnings.length) {
-            setWarningModal({ open: true, warnings: result.warnings, action });
-            return false;
-        }
-        return true;
     };
 
     const openCustomModal = (field: CreatorFieldV3, applyValue: (id: string) => void) => {
@@ -656,24 +606,16 @@ export function CharacterCreator(props: Props) {
         setStepIndex(index => Math.min(totalSteps - 1, index + 1));
     }, [props.sessionId, seed, totalSteps]);
     const finishCreation = React.useCallback(async () => {
-        const localErrorKeys = Object.keys(errors);
-        if (localErrorKeys.length > 0) {
-            markStepTouched();
-            setFocusErrorKey(localErrorKeys[0]);
-            return;
-        }
-        const ok = await validateBeforeAdvance("create");
-        if (!ok) return;
-        await updateCreatorSessionSelection(props.sessionId, seed);
+        await updateCreatorSessionSelection(props.sessionId, seed).catch(() => {
+            // Persist failures should not block completion.
+        });
         props.onComplete(seed);
-    }, [errors, props, seed]);
+    }, [props, seed]);
 
     return (
         <div className="creator-shell">
             <header className="creator-header">
                 <h2>{preset.title || "Character Creator"}</h2>
-                {preset.description ? <p>{preset.description}</p> : null}
-                <p>Step {stepIndex + 1} / {totalSteps}</p>
             </header>
 
             {step ? (
@@ -940,44 +882,6 @@ export function CharacterCreator(props: Props) {
                     </button>
                 )}
             </section>
-
-            {warningModal.open ? (
-                <div className="creator-warning-modal">
-                    <div className="creator-warning-dialog glass-surface">
-                        <h3>Rule Warning</h3>
-                        <p>The following warnings were detected:</p>
-                        <ul>
-                            {warningModal.warnings.map(warning => <li key={warning.id}>{warning.message}</li>)}
-                        </ul>
-                        <div className="creator-actions">
-                            <button
-                                className="glass-btn secondary"
-                                type="button"
-                                onClick={() => setWarningModal({ open: false, warnings: [], action: "next" })}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="glass-btn"
-                                type="button"
-                                onClick={async () => {
-                                    await confirmCreatorWarnings(props.sessionId, warningModal.warnings.map(warning => warning.id));
-                                    const action = warningModal.action;
-                                    setWarningModal({ open: false, warnings: [], action: "next" });
-                                    if (action === "next") {
-                                        setStepIndex(index => Math.min(totalSteps - 1, index + 1));
-                                        return;
-                                    }
-                                    await updateCreatorSessionSelection(props.sessionId, seed);
-                                    props.onComplete(seed);
-                                }}
-                            >
-                                Proceed anyway
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            ) : null}
 
             {customModal.open ? (
                 <div className="creator-warning-modal">

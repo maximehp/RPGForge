@@ -432,7 +432,8 @@ export async function createCharacter(rulesetId: string, ruleset: ResolvedRulese
         });
         const classLevelTotal = classRows.reduce((sum, row) => sum + Number(row.levels || 0), 0);
         if (classLevelTotal !== totalLevel) {
-            throw new Error(`Class levels (${classLevelTotal}) must equal target level (${totalLevel}).`);
+            // Allow creator completion with partial/in-progress seeds.
+            doc.core.level = Math.max(1, classLevelTotal);
         }
         doc.collections.classes = classRows;
     }

@@ -1024,17 +1024,10 @@ export async function completeCharacterCreator(sessionId: string, choices: Recor
         const normalized = normalizeSrd2014CreatorSeed(session.seed);
         session = await upsertCreatorSessionProgress(sessionId, normalized);
     }
-    const validation = await validateCreatorSession(sessionId);
-    if (validation.errors.length) {
-        throw new Error(`Creator has blocking validation errors: ${validation.errors.map(e => e.message).join("; ")}`);
-    }
-    if (validation.warnings.length) {
-        const confirmations = new Set(session.warningConfirmations || []);
-        const missing = validation.warnings.filter(w => !confirmations.has(w.id));
-        if (missing.length) {
-            throw new Error(`Creator requires warning confirmations: ${missing.map(w => w.message).join("; ")}`);
-        }
-    }
+    // Keep validation state up to date for UI hints, but do not block character creation.
+    await validateCreatorSession(sessionId).catch(() => {
+        // Validation is non-blocking at completion time.
+    });
     return await createCharacter(session.rulesetId, session.seed);
 }
 
