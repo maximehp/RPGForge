@@ -212,7 +212,9 @@ export function V2App() {
                 const requestedPack = pack ? resolvePackAlias(pack) : "";
                 const initial = requestedPack && ids.includes(requestedPack)
                     ? requestedPack
-                    : (ids.includes("dnd_srd_5e_2024") ? "dnd_srd_5e_2024" : ids[0]);
+                    : (ids.includes("dnd_srd_5e_2014")
+                        ? "dnd_srd_5e_2014"
+                        : (ids.includes("dnd_srd_5e_2024") ? "dnd_srd_5e_2024" : ids[0]));
 
                 setPackOptions(ids);
                 setSelectedPack(initial || "");
@@ -501,7 +503,6 @@ export function V2App() {
                         refreshToken={creatorRefreshToken}
                         onSeedChange={onCreatorSeedChange}
                         onComplete={onCompleteCreator}
-                        onCancel={() => navigate({ page: "home" })}
                     />
                 ) : null}
 

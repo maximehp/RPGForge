@@ -18,10 +18,6 @@ creator:
           bindTo: name
           required: true
           default: New Adventurer
-        - id: notes
-          label: Character Notes
-          type: text
-          bindTo: notes
         - id: allow_multiclass
           label: Multiclass Enabled (Campaign Rule)
           type: toggle

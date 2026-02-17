@@ -18,13 +18,6 @@ creator:
           bindTo: level
           required: true
           default: 1
-    - id: notes
-      title: Notes
-      fields:
-        - id: notes
-          label: Starting Notes
-          type: text
-          bindTo: notes
     - id: review
       title: Review
       fields:

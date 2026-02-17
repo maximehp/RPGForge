@@ -25,7 +25,6 @@ type Props = {
     refreshToken?: number;
     onSeedChange?: (seed: Record<string, unknown>) => void;
     onComplete: (seed: Record<string, unknown>) => void;
-    onCancel?: () => void;
 };
 
 type StepIssue = { id: string; severity: "error" | "warning"; message: string };
@@ -906,12 +905,13 @@ export function CharacterCreator(props: Props) {
 
             <section className="creator-bottom-nav">
                 <button
-                    className="glass-btn secondary creator-side-nav"
+                    className={`creator-step-pill creator-step-nav ${stepIndex <= 0 ? "is-disabled" : ""}`}
                     type="button"
                     disabled={stepIndex <= 0}
                     onClick={goBack}
                 >
-                    Back
+                    <span>Prev</span>
+                    <strong>Back</strong>
                 </button>
 
                 <nav className="creator-stepper" aria-label="Creator Steps">
@@ -930,30 +930,24 @@ export function CharacterCreator(props: Props) {
 
                 {stepIndex < totalSteps - 1 ? (
                     <button
-                        className="glass-btn creator-side-nav"
+                        className="creator-step-pill creator-step-nav"
                         type="button"
                         onClick={() => void goForward()}
                     >
-                        Next
+                        <span>Move</span>
+                        <strong>Next</strong>
                     </button>
                 ) : (
                     <button
-                        className="glass-btn creator-side-nav"
+                        className="creator-step-pill creator-step-nav"
                         type="button"
                         onClick={() => void finishCreation()}
                     >
-                        Create Character
+                        <span>Finish</span>
+                        <strong>Create</strong>
                     </button>
                 )}
             </section>
-
-            <footer className="creator-actions creator-actions-sticky">
-                {props.onCancel ? (
-                    <button className="glass-btn secondary" type="button" onClick={props.onCancel}>
-                        Cancel
-                    </button>
-                ) : null}
-            </footer>
 
             {warningModal.open ? (
                 <div className="creator-warning-modal">

@@ -705,6 +705,11 @@ button, input, select {
     background: rgba(73, 215, 217, 0.16);
 }
 
+.creator-step-pill.is-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 .creator-step {
     display: grid;
     gap: 12px;
@@ -770,18 +775,9 @@ button, input, select {
     flex-wrap: wrap;
 }
 
-.creator-actions-sticky {
-    position: static;
-    padding: 10px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: var(--radius-sm);
-    background: rgba(8, 18, 30, 0.96);
-    backdrop-filter: blur(8px);
-}
-
 .creator-bottom-nav {
     display: grid;
-    grid-template-columns: 110px minmax(0, 1fr) 150px;
+    grid-template-columns: 84px minmax(0, 1fr) 84px;
     align-items: center;
     gap: 10px;
     padding: 10px;
@@ -790,9 +786,14 @@ button, input, select {
     background: rgba(8, 18, 30, 0.72);
 }
 
-.creator-side-nav {
+.creator-step-nav {
     width: 100%;
-    min-height: 40px;
+    aspect-ratio: 1 / 1;
+    min-height: 74px;
+    text-align: center;
+    align-content: center;
+    justify-items: center;
+    padding: 8px 6px;
 }
 
 .creator-error {
@@ -916,11 +917,11 @@ button, input, select {
         order: 1;
     }
 
-    .creator-bottom-nav .creator-side-nav:first-child {
+    .creator-bottom-nav .creator-step-nav:first-child {
         order: 0;
     }
 
-    .creator-bottom-nav .creator-side-nav:last-child {
+    .creator-bottom-nav .creator-step-nav:last-child {
         order: 2;
     }
 
