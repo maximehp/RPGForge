@@ -802,6 +802,7 @@ button, input, select {
     height: 84px;
     aspect-ratio: 1 / 1;
     min-height: 84px;
+    align-self: start;
     padding: 10px;
     text-align: center;
     align-content: center;
