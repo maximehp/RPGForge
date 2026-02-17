@@ -647,6 +647,32 @@ export function CharacterCreator(props: Props) {
         [classLevels]
     );
     const requiredSubclassIds = React.useMemo(() => requiredSubclassClassIds(seed), [seed]);
+    const goBack = React.useCallback(() => {
+        setStepIndex(index => Math.max(0, index - 1));
+    }, []);
+    const goForward = React.useCallback(async () => {
+        const localErrorKeys = Object.keys(errors);
+        if (localErrorKeys.length > 0) {
+            markStepTouched();
+            setFocusErrorKey(localErrorKeys[0]);
+            return;
+        }
+        const ok = await validateBeforeAdvance("next");
+        if (!ok) return;
+        setStepIndex(index => Math.min(totalSteps - 1, index + 1));
+    }, [errors, totalSteps]);
+    const finishCreation = React.useCallback(async () => {
+        const localErrorKeys = Object.keys(errors);
+        if (localErrorKeys.length > 0) {
+            markStepTouched();
+            setFocusErrorKey(localErrorKeys[0]);
+            return;
+        }
+        const ok = await validateBeforeAdvance("create");
+        if (!ok) return;
+        await updateCreatorSessionSelection(props.sessionId, seed);
+        props.onComplete(seed);
+    }, [errors, props, seed]);
 
     return (
         <div className="creator-shell">
@@ -655,20 +681,6 @@ export function CharacterCreator(props: Props) {
                 {preset.description ? <p>{preset.description}</p> : null}
                 <p>Step {stepIndex + 1} / {totalSteps}</p>
             </header>
-
-            <nav className="creator-stepper" aria-label="Creator Steps">
-                {preset.steps.map((item, index) => (
-                    <button
-                        type="button"
-                        key={item.id}
-                        className={`creator-step-pill ${index === stepIndex ? "is-active" : ""}`}
-                        onClick={() => setStepIndex(index)}
-                    >
-                        <span>{index + 1}</span>
-                        <strong>{item.title}</strong>
-                    </button>
-                ))}
-            </nav>
 
             {step ? (
                 <section className="creator-step">
@@ -892,52 +904,50 @@ export function CharacterCreator(props: Props) {
                 </section>
             ) : null}
 
-            <footer className="creator-actions creator-actions-sticky">
-                {stepIndex > 0 ? (
-                    <button className="glass-btn secondary" type="button" onClick={() => setStepIndex(index => index - 1)}>
-                        Back
-                    </button>
-                ) : null}
+            <section className="creator-bottom-nav">
+                <button
+                    className="glass-btn secondary creator-side-nav"
+                    type="button"
+                    disabled={stepIndex <= 0}
+                    onClick={goBack}
+                >
+                    Back
+                </button>
+
+                <nav className="creator-stepper" aria-label="Creator Steps">
+                    {preset.steps.map((item, index) => (
+                        <button
+                            type="button"
+                            key={item.id}
+                            className={`creator-step-pill ${index === stepIndex ? "is-active" : ""}`}
+                            onClick={() => setStepIndex(index)}
+                        >
+                            <span>{index + 1}</span>
+                            <strong>{item.title}</strong>
+                        </button>
+                    ))}
+                </nav>
 
                 {stepIndex < totalSteps - 1 ? (
                     <button
-                        className="glass-btn"
+                        className="glass-btn creator-side-nav"
                         type="button"
-                        onClick={async () => {
-                            const localErrorKeys = Object.keys(errors);
-                            if (localErrorKeys.length > 0) {
-                                markStepTouched();
-                                setFocusErrorKey(localErrorKeys[0]);
-                                return;
-                            }
-                            const ok = await validateBeforeAdvance("next");
-                            if (!ok) return;
-                            setStepIndex(index => Math.min(totalSteps - 1, index + 1));
-                        }}
+                        onClick={() => void goForward()}
                     >
                         Next
                     </button>
                 ) : (
                     <button
-                        className="glass-btn"
+                        className="glass-btn creator-side-nav"
                         type="button"
-                        onClick={async () => {
-                            const localErrorKeys = Object.keys(errors);
-                            if (localErrorKeys.length > 0) {
-                                markStepTouched();
-                                setFocusErrorKey(localErrorKeys[0]);
-                                return;
-                            }
-                            const ok = await validateBeforeAdvance("create");
-                            if (!ok) return;
-                            await updateCreatorSessionSelection(props.sessionId, seed);
-                            props.onComplete(seed);
-                        }}
+                        onClick={() => void finishCreation()}
                     >
                         Create Character
                     </button>
                 )}
+            </section>
 
+            <footer className="creator-actions creator-actions-sticky">
                 {props.onCancel ? (
                     <button className="glass-btn secondary" type="button" onClick={props.onCancel}>
                         Cancel

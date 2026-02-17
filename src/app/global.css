@@ -651,7 +651,7 @@ button, input, select {
     overflow: hidden;
     padding: 16px 18px 12px;
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
     gap: 14px;
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -669,12 +669,17 @@ button, input, select {
 }
 
 .creator-stepper {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    display: flex;
+    align-items: stretch;
     gap: 8px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: 2px;
 }
 
 .creator-step-pill {
+    flex: 0 0 170px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.03);
@@ -772,6 +777,22 @@ button, input, select {
     border-radius: var(--radius-sm);
     background: rgba(8, 18, 30, 0.96);
     backdrop-filter: blur(8px);
+}
+
+.creator-bottom-nav {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr) 150px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: var(--radius-sm);
+    background: rgba(8, 18, 30, 0.72);
+}
+
+.creator-side-nav {
+    width: 100%;
+    min-height: 40px;
 }
 
 .creator-error {
@@ -887,8 +908,20 @@ button, input, select {
         gap: 10px;
     }
 
+    .creator-bottom-nav {
+        grid-template-columns: 1fr;
+    }
+
     .creator-stepper {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        order: 1;
+    }
+
+    .creator-bottom-nav .creator-side-nav:first-child {
+        order: 0;
+    }
+
+    .creator-bottom-nav .creator-side-nav:last-child {
+        order: 2;
     }
 
     .creator-fields {
