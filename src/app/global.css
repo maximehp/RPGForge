@@ -699,8 +699,7 @@ button, input, select {
 
 .creator-step-pill:hover:not(.is-disabled):not(:disabled) {
     border-color: var(--accent-a);
-    background: rgba(73, 215, 217, 0.2);
-    transform: translateY(-1px);
+    background: rgba(73, 215, 217, 0.12);
 }
 
 .creator-step-pill span {
@@ -805,6 +804,9 @@ button, input, select {
     aspect-ratio: 1 / 1;
     min-height: 84px;
     padding: 10px;
+    text-align: center;
+    align-content: center;
+    justify-items: center;
     flex: 0 0 auto;
     min-width: 0;
     max-width: none;
